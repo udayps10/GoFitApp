@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>GoFit – Log Out</title>
+<style>
+  :root {
+    --bg: #0e0f11;
+    --card: #1a1c22;
+    --border: #2a2d36;
+    --green: #23A55A;
+    --text: #f2f3f5;
+    --muted: #9ea3b0;
+    --muted2: #5c6370;
+    --red: #ED4245;
+    --red-glow: rgba(237,66,69,0.22);
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* --- GRID DECORATION (The Green Boxes) --- */
+  .grid-decoration {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    display: grid;
+    grid-template-columns: repeat(5, 18px);
+    grid-template-rows: repeat(5, 18px);
+    gap: 6px;
+    opacity: 0.5;
+  }
+
+  .grid-box { width: 18px; height: 18px; border-radius: 4px; background: rgba(255, 255, 255, 0.05); }
+  .lvl-1 { background: #0e4429; }
+  .lvl-2 { background: #006d32; }
+  .lvl-3 { background: #26a641; }
+  .lvl-4 { background: #39d353; box-shadow: 0 0 10px rgba(57, 211, 83, 0.2); }
+
+  /* --- CARD --- */
+  .card {
+    position: relative;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    padding: 44px 40px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+    z-index: 10;
+  }
+
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 30px;
+  }
+  .logo-mark {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--green);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-text { font-size: 22px; font-weight: 800; color: #fff; }
+  .logo-text em { color: var(--green); font-style: normal; }
+
+  h2 { font-size: 22px; font-weight: 800; margin-bottom: 10px; }
+  .sub { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 28px; }
+
+  /* --- STATS --- */
+  .stats-strip {
+    display: flex;
+    background: #13141a;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 26px;
+    overflow: hidden;
+  }
+  .strip-item { flex: 1; padding: 14px 8px; border-right: 1px solid var(--border); }
+  .strip-item:last-child { border-right: none; }
+  .strip-val { display: block; font-size: 18px; font-weight: 800; color: var(--green); }
+  .strip-lbl { display: block; font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* --- BUTTONS --- */
+  .btn-logout {
+    width: 100%; background: var(--red); color: #fff;
+    border: none; border-radius: 30px; padding: 15px;
+    font-size: 15px; font-weight: 800; cursor: pointer;
+    margin-bottom: 12px; transition: transform 0.2s, background 0.2s;
+  }
+  .btn-logout:hover { background: #c0393b; transform: translateY(-2px); }
+
+  .btn-stay {
+    width: 100%; background: transparent; color: var(--text);
+    border: 1px solid var(--border); border-radius: 30px;
+    padding: 14px; font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  .btn-stay:hover { background: rgba(255,255,255,0.05); }
+
+  .divider { margin: 15px 0; font-size: 12px; color: var(--muted2); }
+
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 4v16M18 4v16M3 8h3M18 8h3M3 16h3M18 16h3M6 8h12M6 16h12"/>
+      </svg>
+    </div>
+    <span class="logo-text">Go<em>Fit</em></span>
+  </div>
+
+  <h2>Log out of GoFit?</h2>
+  <p class="sub">Your progress and streak are saved.<br>We'll be here when you're back.</p>
+
+  <div class="stats-strip">
+    <div class="strip-item">
+      <span class="strip-val">5</span>
+      <span class="strip-lbl">Day streak</span>
+    </div>
+    <div class="strip-item">
+      <span class="strip-val">1,500</span>
+      <span class="strip-lbl">kcal today</span>
+    </div>
+    <div class="strip-item">
+      <span class="strip-val">6,000</span>
+      <span class="strip-lbl">Steps</span>
+    </div>
+  </div>
+
+  <button class="btn-logout">Log out</button>
+  <div class="divider">or</div>
+  <button class="btn-stay">Stay on GoFit</button>
+</div>
+
+<div class="grid-decoration">
+  <div class="grid-box lvl-1"></div><div class="grid-box"></div><div class="grid-box lvl-2"></div><div class="grid-box"></div><div class="grid-box lvl-1"></div>
+  <div class="grid-box lvl-3"></div><div class="grid-box lvl-1"></div><div class="grid-box"></div><div class="grid-box lvl-4"></div><div class="grid-box lvl-2"></div>
+  <div class="grid-box lvl-2"></div><div class="grid-box"></div><div class="grid-box lvl-1"></div><div class="grid-box"></div><div class="grid-box lvl-3"></div>
+  <div class="grid-box"></div><div class="grid-box lvl-1"></div><div class="grid-box lvl-2"></div><div class="grid-box"></div><div class="grid-box"></div>
+  <div class="grid-box lvl-1"></div><div class="grid-box lvl-3"></div><div class="grid-box lvl-4"></div><div class="grid-box lvl-2"></div><div class="grid-box"></div>
+</div>
+
+</body>
+</html>
