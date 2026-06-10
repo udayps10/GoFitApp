@@ -194,6 +194,12 @@ The `user` object (type `User`) is stored in session on login and removed on log
 - The Gemini AI API key in `userdashboard.jsp` must be replaced with your own key from [Google AI Studio](https://aistudio.google.com).
 - The app is designed as an MVP — future features like workout planning, sets tracking, and personal records can be added using the existing database architecture.
 
+
+## 🤝 Contributions
+Contributions, issues, and feature requests are welcome.
+
+Feel free to fork this repository and submit a pull request.
+
 ---
 
 ## 👨‍💻 Built By
