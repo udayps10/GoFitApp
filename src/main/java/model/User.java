@@ -9,6 +9,7 @@ public class User {
     private double weightKg;
     private double heightCm;
     private String goal;
+    private int calorieGoal;
 
     public int getId()                  { return id; }
     public void setId(int id)           { this.id = id; }
@@ -33,4 +34,7 @@ public class User {
 
     public String getGoal()             { return goal; }
     public void setGoal(String goal)    { this.goal = goal; }
+
+    public int getCalorieGoal()                 { return calorieGoal; }
+    public void setCalorieGoal(int calorieGoal) { this.calorieGoal = calorieGoal; }
 }

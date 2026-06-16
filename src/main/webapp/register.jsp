@@ -426,7 +426,7 @@
               <option value="Lose Fat">Lose Fat</option>
               <option value="Build Muscle">Build Muscle</option>
               <option value="Maintain Weight" selected>Maintain Weight</option>
-              <option value="Improve Endurance">Improve Endurance</option>
+             
             </select>
           </div>
 

@@ -1,7 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><!DOCTYPE html>
 <html lang="en">
-<!DOCTYPE html>
-<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -58,18 +56,6 @@
   }
   .hdr-left h1 { font-size: 24px; font-weight: 600; letter-spacing: -0.3px; }
   .hdr-left p { color: var(--muted); font-size: 13px; margin-top: 3px; }
-
-  .streak-badge {
-    background: linear-gradient(135deg, #f97316, #ef4444);
-    border-radius: 14px;
-    padding: 10px 16px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    box-shadow: 0 4px 20px rgba(249,115,22,0.3);
-  }
-  .streak-badge .snum { font-size: 26px; font-weight: 700; color: white; line-height: 1; }
-  .streak-badge .slbl { font-size: 11px; color: rgba(255,255,255,0.88); line-height: 1.4; font-weight: 500; }
 
   /* ---- DATE NAV ---- */
   .date-nav {
@@ -150,16 +136,6 @@
   .goal-bar-fill { height: 100%; background: var(--green); border-radius: 99px; transition: width 0.8s cubic-bezier(.4,0,.2,1); }
   .goal-msg { background: var(--bg3); border-radius: var(--r-sm); padding: 9px 13px; font-size: 13px; color: var(--text); }
 
-  /* ---- TWO COLUMN ROW ---- */
-  .two-col {
-    display: grid;
-    grid-template-columns: 1fr 260px;
-    gap: 14px;
-    margin-bottom: 16px;
-    align-items: stretch;
-  }
-  .two-col > div { display: flex; flex-direction: column; justify-content: space-between; height: 100%; }
-
   /* ---- AI INSIGHT ---- */
   .ai-card {
     background: var(--purple-bg);
@@ -188,40 +164,6 @@
     font-size: 12px;
     color: #c084fc;
   }
-
-  /* ---- STREAK COMPACT ---- */
-  .streak-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--r-lg);
-    padding: 14px;
-  }
-  .streak-card-hdr {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 12px;
-  }
-  .streak-card-title { font-size: 13px; font-weight: 600; }
-  .streak-mini-badge {
-    background: linear-gradient(135deg, #f97316, #ef4444);
-    border-radius: 10px; padding: 3px 10px;
-    font-size: 11px; font-weight: 600; color: white;
-  }
-  .mini-cal-hdrs { display: grid; grid-template-columns: repeat(7,1fr); margin-bottom: 4px; }
-  .mini-cal-hdr { text-align: center; font-size: 9px; color: var(--hint); padding: 2px 0; }
-  .mini-cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; }
-  .mcd {
-    aspect-ratio: 1;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 5px; font-size: 9px; color: var(--hint);
-    position: relative;
-  }
-  .mcd.has-dot::after {
-    content: ''; position: absolute; bottom: 2px;
-    width: 3px; height: 3px; background: var(--green); border-radius: 50%;
-  }
-  .mcd.today-hl { background: var(--green); color: white; font-weight: 700; }
-  .mcd.active-day { background: var(--green-bg); color: var(--green); }
-  .streak-msg { text-align: center; font-size: 11px; color: var(--orange); margin-top: 10px; font-weight: 500; }
 
   /* ---- SECTION CARD ---- */
   .section-card {
@@ -474,6 +416,29 @@
   .btn-log-scan { width: 100%; padding: 9px; background: transparent; border: 1px solid rgba(34,197,94,0.35); border-radius: var(--r-md); color: var(--green); font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; display: none; margin-bottom: 8px; }
   #fileInput { display: none; }
 
+  /* ---- GOAL OPTION BUTTONS ---- */
+  .goal-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+  .goal-option {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--bg3); border: 2px solid var(--border);
+    border-radius: var(--r-md); padding: 13px 15px;
+    cursor: pointer; transition: all 0.15s; text-align: left;
+    font-family: inherit; color: var(--text); width: 100%;
+  }
+  .goal-option:hover { border-color: var(--green); background: var(--green-bg); }
+  .goal-option.selected { border-color: var(--green); background: var(--green-bg); }
+  .goal-option .go-icon { font-size: 22px; flex-shrink: 0; }
+  .goal-option .go-label { font-size: 14px; font-weight: 600; }
+  .goal-option .go-desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .goal-option.selected .go-check {
+    margin-left: auto; width: 20px; height: 20px;
+    background: var(--green); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: #060d08; font-weight: 700; flex-shrink: 0;
+  }
+  .go-check { display: none; }
+  .goal-option.selected .go-check { display: flex; }
+
   /* ---- RESPONSIVE ---- */
   @media (max-width: 640px) {
     .two-col { grid-template-columns: 1fr; }
@@ -486,51 +451,114 @@
     .actions-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   }
   
-  /* ---- SIDEBAR ---- */
+  /* ---- HAMBURGER DROPDOWN ---- */
   .app-container { display: flex; min-height: 100vh; }
-  .sidebar { 
-    position: fixed; left: -240px; top: 0; bottom: 0;
-    width: 240px; background: var(--bg2); border-right: 1px solid var(--border); padding: 20px 16px; display: flex; flex-direction: column; gap: 8px; z-index: 1000; transition: left 0.3s ease; 
+  .main-content { flex: 1; min-width: 0; }
+  .menu-btn {
+    background: none; border: none; color: var(--text);
+    cursor: pointer; margin-right: 12px;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    gap: 5px; width: 36px; height: 36px; padding: 4px; flex-shrink: 0;
   }
-  .sidebar.open { left: 0; }
-  .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; display: none; }
-  .sidebar-overlay.open { display: block; }
-  .sidebar-label { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; padding: 0 8px; margin-top: 10px; }
-  .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--r-md); font-size: 14px; font-weight: 500; color: var(--muted); text-decoration: none; transition: background .15s, color .15s; }
-  .sidebar-item.active { background: var(--green-bg); color: var(--green); }
-  .sidebar-item:not(.active):hover { background: rgba(255,255,255,0.05); color: var(--text); }
-  .sidebar-icon { font-size: 18px; width: 24px; text-align: center; }
-  .main-content { flex: 1; min-width: 0; height: 100vh; overflow-y: auto; }
-  .menu-btn { background: none; border: none; color: var(--text); font-size: 24px; cursor: pointer; margin-right: 12px; }
+  .menu-btn span {
+    display: block; width: 22px; height: 2px;
+    background: var(--text); border-radius: 2px;
+    transition: all 0.3s ease; transform-origin: center;
+  }
+  .menu-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .menu-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .menu-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  .nav-dropdown {
+    position: absolute; top: 70px; left: 20px;
+    background: var(--bg2); border: 1px solid var(--border2);
+    border-radius: var(--r-lg); min-width: 210px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+    z-index: 1000; display: none; overflow: hidden;
+    animation: dropIn 0.18s ease;
+  }
+  .nav-dropdown.open { display: block; }
+  @keyframes dropIn { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+
+  .nav-brand {
+    padding: 14px 16px 10px;
+    display: flex; align-items: center; gap: 8px;
+    border-bottom: 1px solid var(--border);
+    font-size: 15px; font-weight: 700; color: var(--text);
+  }
+  .nav-brand .brand-icon {
+    background: var(--green); color: #000;
+    padding: 3px 7px; border-radius: 6px; font-size: 14px;
+  }
+
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 16px; font-size: 14px; font-weight: 500;
+    color: var(--muted); text-decoration: none;
+    transition: background .15s, color .15s; cursor: pointer;
+  }
+  .nav-item.active { color: var(--green); background: var(--green-bg); }
+  .nav-item:not(.active):not(.nav-logout):hover { background: rgba(255,255,255,0.05); color: var(--text); }
+  .nav-icon { font-size: 17px; width: 22px; text-align: center; }
+
+  .nav-divider { height: 1px; background: var(--border); margin: 4px 0; }
+
+  .nav-logout {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 16px 14px; font-size: 14px; font-weight: 500;
+    color: #ef4444; text-decoration: none; cursor: pointer;
+    transition: background .15s;
+  }
+  .nav-logout:hover { background: rgba(239,68,68,0.07); }
+
+  .nav-overlay {
+    position: fixed; inset: 0; z-index: 999; display: none;
+  }
+  .nav-overlay.open { display: block; }
 </style>
 </head>
 <body>
 <div class="app-container">
-  <div class="sidebar" id="sidebar">
-    <div class="sidebar-label" style="font-size: 18px; color: var(--text); margin-bottom: 20px; font-family: 'DM Sans', sans-serif;">
-      <span style="background: var(--green); color: #000; padding: 4px 8px; border-radius: 8px; margin-right: 6px;">💪</span> GoFit
+  <!-- NAV OVERLAY (closes dropdown on outside click) -->
+  <div class="nav-overlay" id="navOverlay" onclick="toggleMenu()"></div>
+
+  <!-- HAMBURGER DROPDOWN -->
+  <div class="nav-dropdown" id="navDropdown">
+    <div class="nav-brand">
+      <span class="brand-icon">💪</span> GoFit
     </div>
-    <div class="sidebar-label">Menu</div>
-    <a href="userdashboard.jsp" class="sidebar-item active"><span class="sidebar-icon">📊</span> Dashboard</a>
-    <a href="calorie.jsp" class="sidebar-item"><span class="sidebar-icon">🍎</span> Calories</a>
-    <a href="workout.jsp" class="sidebar-item"><span class="sidebar-icon">🏋️</span> Workout</a>
+    <a href="userdashboard.jsp" class="nav-item active">
+      <span class="nav-icon">📊</span>
+      <div><div>Dashboard</div></div>
+    </a>
+    <a href="calorie.jsp" class="nav-item">
+      <span class="nav-icon">🍎</span>
+      <div><div>Food Tracking</div></div>
+    </a>
+    <a href="workout.jsp" class="nav-item">
+      <span class="nav-icon">🏋️</span>
+      <div><div>Workout</div></div>
+    </a>
+    <div class="nav-divider"></div>
+    <a href="logout.jsp" class="nav-logout">
+      <span class="nav-icon">🚪</span>
+      <div>Logout</div>
+    </a>
   </div>
-  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
   <div class="main-content">
 <div class="dash">
 
   <!-- HEADER -->
   <div class="hdr">
     <div class="hdr-left" style="display: flex; align-items: center;">
-      <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+      <button class="menu-btn" id="menuBtn" onclick="toggleMenu()">
+        <span></span><span></span><span></span>
+      </button>
       <div>
         <h1>Hi Uday 👋</h1>
         <p id="hdr-sub">Let's crush your goals today!</p>
       </div>
-    </div>
-    <div class="streak-badge">
-      <span class="snum">5</span>
-      <div><div class="slbl">day</div><div class="slbl">streak</div></div>
     </div>
   </div>
 
@@ -583,9 +611,8 @@
     <div class="goal-msg">💪 Halfway there! You got this!</div>
   </div>
 
-  <!-- AI + STREAK ROW -->
-  <div class="two-col">
-    <div class="ai-card">
+  <!-- AI INSIGHT (full width) -->
+  <div class="ai-card" style="margin-bottom:16px;">
       <div class="ai-hdr">
         <div class="ai-icon">🤖</div>
         <div>
@@ -601,16 +628,6 @@
         <span class="ai-pill">🍛 Rice + dal ~420 kcal</span>
         <span class="ai-pill">🥜 Peanut butter + banana</span>
       </div>
-    </div>
-    <div class="streak-card">
-      <div class="streak-card-hdr">
-        <div class="streak-card-title">🔥 Streak</div>
-        <div class="streak-mini-badge">5 days</div>
-      </div>
-      <div class="mini-cal-hdrs" id="mini-hdrs"></div>
-      <div class="mini-cal-grid" id="mini-grid"></div>
-      <div class="streak-msg">🏆 Keep it going!</div>
-    </div>
   </div>
 
   <!-- QUICK ACTIONS -->
@@ -692,14 +709,17 @@
       </div>
     </div>
     <div class="body-card">
-      <div class="body-card-title">📏 Height</div>
+      <div class="body-card-title">🎯 Goal</div>
       <div class="body-val-row">
-        <div class="body-val" id="height-val">— <small>cm</small></div>
-        <button class="upd-btn" onclick="openModal('height')">Update</button>
+        <div>
+          <div class="body-val" style="font-size:20px; line-height:1.2;" id="goal-display">Maintain Weight</div>
+          <div style="font-size:12px; color:var(--muted); margin-top:4px;" id="goal-desc">Stay at current calorie balance</div>
+        </div>
+        <button class="upd-btn" onclick="openModal('goal')">Change</button>
       </div>
       <div class="bmi-section">
-        <div class="bmi-lbl">Used for</div>
-        <div class="bmi-hint">BMI calculation & calorie targets</div>
+        <div class="bmi-lbl">Current target</div>
+        <div class="bmi-hint" id="goal-hint">2000 kcal / day</div>
       </div>
     </div>
   </div>
@@ -786,26 +806,55 @@
   </div>
 </div>
 
-<!-- HEIGHT MODAL -->
-<div class="modal-overlay" id="modal-height">
+<!-- GOAL MODAL -->
+<div class="modal-overlay" id="modal-goal">
   <div class="modal">
-    <h3>📏 Update Height</h3>
-    <input type="number" id="new-height" placeholder="Height (cm)" />
+    <h3>🎯 Change Goal</h3>
+    <div class="goal-options">
+      <button class="goal-option" id="goal-lose" onclick="selectGoal('lose')">
+        <span class="go-icon">🔥</span>
+        <div>
+          <div class="go-label">Lose Fat</div>
+          <div class="go-desc">Calorie deficit · burn more than you eat</div>
+        </div>
+        <span class="go-check">✓</span>
+      </button>
+      <button class="goal-option" id="goal-build" onclick="selectGoal('build')">
+        <span class="go-icon">💪</span>
+        <div>
+          <div class="go-label">Build Muscle</div>
+          <div class="go-desc">Calorie surplus · fuel your gains</div>
+        </div>
+        <span class="go-check">✓</span>
+      </button>
+      <button class="goal-option selected" id="goal-maintain" onclick="selectGoal('maintain')">
+        <span class="go-icon">⚖️</span>
+        <div>
+          <div class="go-label">Maintain Weight</div>
+          <div class="go-desc">Stay at current calorie balance</div>
+        </div>
+        <span class="go-check">✓</span>
+      </button>
+    </div>
     <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal('height')">Cancel</button>
-      <button class="btn-save" onclick="saveHeight()">Update</button>
+      <button class="btn-cancel" onclick="closeModal('goal')">Cancel</button>
+      <button class="btn-save" onclick="saveGoal()">Save Goal</button>
     </div>
   </div>
 </div>
-
-<script>
+		
+			<script>
   /* ===== YOUR API KEY ===== */
   var GEMINI_KEY = 'YOUR_GEMINI_API_KEY_HERE';
 
-  /* ===== SIDEBAR ===== */
-  function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('open');
-    document.getElementById('sidebarOverlay').classList.toggle('open');
+  /* ===== HAMBURGER MENU ===== */
+  function toggleMenu() {
+    var btn = document.getElementById('menuBtn');
+    var dd = document.getElementById('navDropdown');
+    var ov = document.getElementById('navOverlay');
+    btn.classList.toggle('open');
+    dd.classList.toggle('open');
+    ov.classList.toggle('open');
   }
 
   /* ===== STATE ===== */
@@ -886,34 +935,6 @@
   }
   updateDateDisplay();
 
-  /* ===== MINI CALENDAR (April 2026) ===== */
-  var streakDays = [1,3,5,8,12,18,19,20,25,27,28,29,30,31];
-  var dayNames = ['Mo','Tu','We','Th','Fr','Sa','Su'];
-  var hdrEl = document.getElementById('mini-hdrs');
-  var gridEl = document.getElementById('mini-grid');
-  var todayDate = 4; // April 4, 2026
-
-  dayNames.forEach(function(d) {
-    var el = document.createElement('div');
-    el.className = 'mini-cal-hdr';
-    el.textContent = d;
-    hdrEl.appendChild(el);
-  });
-  // April 2026 starts on Wednesday = 2 blank cells (Mon=0, Tue=1, Wed=2)
-  for (var i = 0; i < 2; i++) {
-    var bl = document.createElement('div');
-    gridEl.appendChild(bl);
-  }
-  for (var day = 1; day <= 30; day++) {
-    var el = document.createElement('div');
-    el.className = 'mcd';
-    el.textContent = day;
-    if (streakDays.includes(day)) el.classList.add('has-dot');
-    if (day === todayDate) el.classList.add('today-hl');
-    else if (streakDays.includes(day)) el.classList.add('active-day');
-    gridEl.appendChild(el);
-  }
-
   /* ===== MODALS ===== */
   function openModal(t) {
     if ((t === 'food' || t === 'workout') && offset < 0) return; // block past day logging
@@ -990,18 +1011,32 @@
     weightKg = val;
     document.getElementById('weight-val').innerHTML = val + ' <small>kg</small>';
     document.getElementById('new-weight').value = '';
-    updateBMI();
     closeModal('weight');
   }
 
-  function saveHeight() {
-    var val = parseFloat(document.getElementById('new-height').value);
-    if (!val) return;
-    heightCm = val;
-    document.getElementById('height-val').innerHTML = val + ' <small>cm</small>';
-    document.getElementById('new-height').value = '';
-    updateBMI();
-    closeModal('height');
+  /* ===== GOAL ===== */
+  var currentGoal = 'maintain';
+  var pendingGoal = 'maintain';
+  var goalData = {
+    lose:     { label: 'Lose Fat',        desc: 'Calorie deficit · burn more',   hint: '1600 kcal / day', icon: '🔥' },
+    build:    { label: 'Build Muscle',    desc: 'Calorie surplus · fuel gains',  hint: '2400 kcal / day', icon: '💪' },
+    maintain: { label: 'Maintain Weight', desc: 'Stay at current calorie balance', hint: '2000 kcal / day', icon: '⚖️' }
+  };
+
+  function selectGoal(key) {
+    pendingGoal = key;
+    ['lose','build','maintain'].forEach(function(k) {
+      document.getElementById('goal-' + k).classList.toggle('selected', k === key);
+    });
+  }
+
+  function saveGoal() {
+    currentGoal = pendingGoal;
+    var d = goalData[currentGoal];
+    document.getElementById('goal-display').textContent = d.label;
+    document.getElementById('goal-desc').textContent = d.desc;
+    document.getElementById('goal-hint').textContent = d.hint;
+    closeModal('goal');
   }
 
   function updateBMI() {

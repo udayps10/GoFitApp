@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%> <!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="en">
 <head>
@@ -13,16 +13,116 @@
   .corner-deco { position: fixed; bottom: 0; right: 0; width: 180px; height: 180px; pointer-events: none; z-index: 0; opacity: 0.55; }
   .corner-deco svg { width: 100%; height: 100%; }
 
-  nav { background: #0b1220; border-bottom: 1px solid rgba(255,255,255,0.07); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 58px; position: relative; z-index: 10; }
-  .logo { display: flex; align-items: center; gap: 10px; font-family: 'DM Serif Display', serif; font-size: 1.2rem; }
-  .logo-box { width: 32px; height: 32px; background: #4ade80; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+  /* ===== NAV ===== */
+  nav {
+    background: #0b1220;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    height: 58px;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+  }
+  .nav-brand {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none;
+  }
+  .logo-box {
+    width: 32px; height: 32px;
+    background: #4ade80;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; flex-shrink: 0;
+  }
+  .logo-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.2rem; color: #f0f4f8;
+  }
   .nav-right { display: flex; align-items: center; gap: 10px; }
-  .over-alert { display: none; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #fff; background: #dc2626; border: 1px solid #f87171; padding: 4px 12px; border-radius: 20px; animation: alertpulse 1.5s infinite; }
+  .over-alert {
+    display: none; font-size: 0.72rem; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: #fff; background: #dc2626; border: 1px solid #f87171;
+    padding: 4px 12px; border-radius: 20px;
+    animation: alertpulse 1.5s infinite;
+  }
   @keyframes alertpulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
-  .user-btn { width: 34px; height: 34px; background: #131f30; border: 1px solid rgba(255,255,255,0.07); border-radius: 50%; color: #5a7291; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: color 0.2s; }
-  .user-btn:hover { color: #f0f4f8; }
-  .logout-btn { padding: 6px 14px; background: transparent; border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #5a7291; font-family: 'DM Sans', Arial, sans-serif; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: color 0.2s, border-color 0.2s; }
-  .logout-btn:hover { color: #f87171; border-color: rgba(248,113,113,0.4); }
+
+  /* Hamburger button */
+  .ham-btn {
+    background: none; border: none; cursor: pointer;
+    display: flex; flex-direction: column; justify-content: center;
+    align-items: center; gap: 5px;
+    width: 36px; height: 36px; padding: 4px;
+    border-radius: 8px; transition: background 0.15s; flex-shrink: 0;
+  }
+  .ham-btn:hover { background: rgba(255,255,255,0.06); }
+  .ham-btn span {
+    display: block; width: 22px; height: 2px;
+    background: #f0f4f8; border-radius: 2px;
+    transition: transform 0.25s, opacity 0.2s, transform-origin 0.2s;
+    transform-origin: center;
+  }
+  .ham-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .ham-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .ham-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* Dropdown */
+  .nav-dropdown {
+    position: absolute; top: 58px; left: 20px;
+    background: #0b1220;
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 14px;
+    min-width: 210px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    display: none; flex-direction: column;
+    overflow: hidden;
+    z-index: 199;
+    animation: dropIn 0.18s ease;
+  }
+  @keyframes dropIn { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+  .nav-dropdown.open { display: flex; }
+
+  .nav-brand-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    font-size: 15px; font-weight: 700; color: #f0f4f8;
+  }
+  .nav-brand-icon {
+    background: #4ade80; color: #000;
+    padding: 3px 7px; border-radius: 6px; font-size: 14px;
+  }
+
+  .nav-dropdown a {
+    display: flex; align-items: center; gap: 10px;
+    color: #5a7291; text-decoration: none;
+    font-size: 0.92rem; font-weight: 600;
+    padding: 11px 16px;
+    transition: color 0.15s, background 0.15s;
+  }
+  .nav-dropdown a .nav-icon { font-size: 17px; width: 22px; text-align: center; }
+  .nav-dropdown a:hover { color: #f0f4f8; background: rgba(255,255,255,0.05); }
+  .nav-dropdown a.active { color: #4ade80; background: rgba(74,222,128,0.08); }
+
+  .nav-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 4px 0; }
+
+  .nav-logout {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 16px 14px;
+    font-size: 0.92rem; font-weight: 600;
+    color: #f87171; cursor: pointer;
+    transition: background 0.15s;
+  }
+  .nav-logout:hover { background: rgba(248,113,113,0.07); }
+  .nav-logout .nav-icon { font-size: 17px; width: 22px; text-align: center; }
+
+  .nav-overlay { position: fixed; inset: 0; z-index: 198; display: none; }
+  .nav-overlay.open { display: block; }
+  /* ===== END NAV ===== */
 
   main { max-width: 620px; margin: 0 auto; padding: 28px 18px 100px; position: relative; z-index: 1; }
 
@@ -78,98 +178,40 @@
   .ai-insight-card {
     background: linear-gradient(135deg, #1a1040 0%, #231355 50%, #1a1040 100%);
     border: 1px solid rgba(167,139,250,0.35);
-    border-radius: 16px;
-    padding: 18px 18px 16px;
-    margin-bottom: 14px;
-    position: relative;
-    overflow: hidden;
+    border-radius: 16px; padding: 18px 18px 16px;
+    margin-bottom: 14px; position: relative; overflow: hidden;
   }
-  /* subtle glow blob */
   .ai-insight-card::before {
-    content: '';
-    position: absolute;
-    top: -30px; right: -30px;
+    content: ''; position: absolute; top: -30px; right: -30px;
     width: 120px; height: 120px;
     background: radial-gradient(circle, rgba(167,139,250,0.18) 0%, transparent 70%);
-    border-radius: 50%;
-    pointer-events: none;
+    border-radius: 50%; pointer-events: none;
   }
-  .ai-insight-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-  }
+  .ai-insight-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
   .ai-insight-icon {
-    width: 34px; height: 34px;
-    background: rgba(139,92,246,0.25);
-    border: 1px solid rgba(167,139,250,0.4);
-    border-radius: 9px;
+    width: 34px; height: 34px; background: rgba(139,92,246,0.25);
+    border: 1px solid rgba(167,139,250,0.4); border-radius: 9px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 1rem;
-    flex-shrink: 0;
+    font-size: 1rem; flex-shrink: 0;
   }
-  .ai-insight-title-block {}
-  .ai-insight-label {
-    font-size: 0.62rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: #a78bfa;
-  }
-  .ai-insight-subtitle {
-    font-size: 0.72rem;
-    color: rgba(167,139,250,0.6);
-    margin-top: 1px;
-  }
-
-  /* halfway banner */
+  .ai-insight-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #a78bfa; }
+  .ai-insight-subtitle { font-size: 0.72rem; color: rgba(167,139,250,0.6); margin-top: 1px; }
   .ai-halfway-banner {
-    background: rgba(139,92,246,0.12);
-    border: 1px solid rgba(167,139,250,0.2);
-    border-radius: 8px;
-    padding: 7px 12px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #c4b5fd;
-    margin-bottom: 10px;
-    display: none;
+    background: rgba(139,92,246,0.12); border: 1px solid rgba(167,139,250,0.2);
+    border-radius: 8px; padding: 7px 12px; font-size: 0.8rem; font-weight: 600;
+    color: #c4b5fd; margin-bottom: 10px; display: none;
   }
-
-  .ai-insight-text {
-    font-size: 0.87rem;
-    line-height: 1.6;
-    color: #e2d9f3;
-    margin-bottom: 14px;
-  }
-  .ai-insight-text strong {
-    color: #fff;
-    font-weight: 700;
-  }
-  .ai-insight-chips {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
+  .ai-insight-text { font-size: 0.87rem; line-height: 1.6; color: #e2d9f3; margin-bottom: 14px; }
+  .ai-insight-text strong { color: #fff; font-weight: 700; }
+  .ai-insight-chips { display: flex; gap: 8px; flex-wrap: wrap; }
   .ai-chip {
-    padding: 7px 14px;
-    background: rgba(109,40,217,0.35);
-    border: 1px solid rgba(139,92,246,0.4);
-    border-radius: 20px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: #ddd6fe;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
+    padding: 7px 14px; background: rgba(109,40,217,0.35);
+    border: 1px solid rgba(139,92,246,0.4); border-radius: 20px;
+    font-size: 0.78rem; font-weight: 600; color: #ddd6fe;
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
     display: flex; align-items: center; gap: 5px;
   }
-  .ai-chip:hover {
-    background: rgba(139,92,246,0.45);
-    border-color: rgba(167,139,250,0.7);
-    color: #fff;
-    transform: translateY(-1px);
-  }
+  .ai-chip:hover { background: rgba(139,92,246,0.45); border-color: rgba(167,139,250,0.7); color: #fff; transform: translateY(-1px); }
   .ai-chip-emoji { font-size: 0.9rem; }
 
   /* ---- TABS ---- */
@@ -288,13 +330,32 @@
 </div>
 
 <nav>
-  <div class="logo"><div class="logo-box">💪</div>GoFit</div>
+  <a href="userdashboard.jsp" class="nav-brand">
+    <div class="logo-box">💪</div>
+    <span class="logo-text">GoFit</span>
+  </a>
   <div class="nav-right">
     <span class="over-alert" id="overAlert">⚠ Over Goal!</span>
-    <button class="user-btn">👤</button>
-    <button class="logout-btn" onclick="logout()">Log out</button>
+    <button class="ham-btn" id="hamBtn" onclick="toggleNav()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
+
+<!-- NAV OVERLAY -->
+<div class="nav-overlay" id="navOverlay" onclick="closeNav()"></div>
+
+<!-- DROPDOWN -->
+<div class="nav-dropdown" id="navDropdown">
+  <div class="nav-brand-row">
+    <span class="nav-brand-icon">💪</span> GoFit
+  </div>
+  <a href="userdashboard.jsp"><span class="nav-icon">📊</span> Dashboard</a>
+  <a href="calorie.jsp" class="active"><span class="nav-icon">🍎</span> Food Tracking</a>
+  <a href="workout.jsp"><span class="nav-icon">🏋️</span> Workout</a>
+  <div class="nav-divider"></div>
+  <div class="nav-logout" onclick="logout()"><span class="nav-icon">🚪</span> Logout</div>
+</div>
 
 <main>
 
@@ -361,7 +422,7 @@
     </div>
   </div>
 
-  <!-- ===== AI INSIGHT CARD ===== -->
+  <!-- AI INSIGHT CARD -->
   <div class="ai-insight-card" id="aiInsightCard">
     <div class="ai-halfway-banner" id="halfwayBanner">💪 Halfway there! You got this!</div>
     <div class="ai-insight-header">
@@ -463,27 +524,36 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  var GEMINI_KEY = 'YOUR_GEMINI_API_KEY_HERE';
+  var GEMINI_KEY = '';
   var data = {}, dayOffset = 0, GOAL = 2200;
   var capturedB64 = null, capturedMime = 'image/jpeg';
   var stream = null, aiDetectedItems = [];
 
-  /* ===== QUICK LOG (from AI chip) ===== */
+  /* ===== NAV ===== */
+  function toggleNav() {
+    var open = document.getElementById('navDropdown').classList.toggle('open');
+    document.getElementById('hamBtn').classList.toggle('open', open);
+    document.getElementById('navOverlay').classList.toggle('open', open);
+  }
+  function closeNav() {
+    document.getElementById('navDropdown').classList.remove('open');
+    document.getElementById('hamBtn').classList.remove('open');
+    document.getElementById('navOverlay').classList.remove('open');
+  }
+
+  /* ===== QUICK LOG ===== */
   function quickLog(name, serving, kcal, carbs, protein, fat) {
     addFoodItem(name, serving, kcal, carbs, protein, fat, '🤖 AI suggestion');
     showToast('✅ ' + name + ' logged!', true);
   }
 
-  /* ===== AI INSIGHT UPDATE ===== */
+  /* ===== AI INSIGHT ===== */
   function updateInsight(totalKcal, remaining, over) {
     var banner = document.getElementById('halfwayBanner');
     var text = document.getElementById('aiInsightText');
     var chips = document.getElementById('aiInsightChips');
     var pct = totalKcal / GOAL;
-
-    // halfway banner
     banner.style.display = (pct >= 0.45 && pct < 0.65) ? 'block' : 'none';
-
     if (totalKcal === 0) {
       text.innerHTML = 'Start logging your meals to get personalised AI recommendations for the day.';
       chips.innerHTML =
@@ -696,16 +766,14 @@
     toastT=setTimeout(function(){el.classList.remove('show');},3200);
   }
   function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-  function logout(){if(confirm('Log out of GoFit?'))alert('Logged out!');}
+  function logout(){ closeNav(); if(confirm('Log out of GoFit?')) window.location.href='logout.jsp'; }
 
   /* ===== RENDER ===== */
   function render(){
     var items=getItems();
     var totalKcal=0,totalC=0,totalP=0,totalF=0;
     items.forEach(function(i){totalKcal+=i.kcal;totalC+=i.carbs;totalP+=i.protein;totalF+=i.fat;});
-
     var remaining=GOAL-totalKcal, pct=Math.round(totalKcal/GOAL*100), over=totalKcal>GOAL, dp=Math.min(pct,100);
-
     document.getElementById('overAlert').style.display=over?'inline-block':'none';
     document.getElementById('statConsumed').innerText=totalKcal;
     document.getElementById('statOver').innerText=over?'+'+(totalKcal-GOAL)+' over':'';
@@ -715,7 +783,6 @@
     document.getElementById('progPct').innerText=pct+'%';
     document.getElementById('progStatus').innerText=over?'Over goal 🔴':pct>80?'Almost there 🟡':pct>0?'On track 🟢':'No food yet';
     var fill=document.getElementById('progFill'); fill.style.width=dp+'%'; fill.className=over?'prog-fill over':'prog-fill';
-
     var totalMacroG=totalC+totalP+totalF;
     var cPct=totalMacroG>0?Math.round(totalC/totalMacroG*100):0;
     var pPct=totalMacroG>0?Math.round(totalP/totalMacroG*100):0;
@@ -732,12 +799,8 @@
     document.getElementById('stackC').style.width=cPct+'%';
     document.getElementById('stackP').style.width=pPct+'%';
     document.getElementById('stackF').style.width=fPct+'%';
-
     document.getElementById('itemCount').innerText=items.length+' items';
-
-    /* AI insight */
     updateInsight(totalKcal, remaining, over);
-
     var html='';
     if(!items.length){html="<div class='empty'>No food added yet</div>";}
     else{items.forEach(function(item,i){
