@@ -115,6 +115,7 @@
 </style>
 </head>
 <body>
+<form action = "logout" method = "post">
 
 <div class="card">
   <div class="logo">
@@ -155,7 +156,8 @@
   <div class="grid-box lvl-2"></div><div class="grid-box"></div><div class="grid-box lvl-1"></div><div class="grid-box"></div><div class="grid-box lvl-3"></div>
   <div class="grid-box"></div><div class="grid-box lvl-1"></div><div class="grid-box lvl-2"></div><div class="grid-box"></div><div class="grid-box"></div>
   <div class="grid-box lvl-1"></div><div class="grid-box lvl-3"></div><div class="grid-box lvl-4"></div><div class="grid-box lvl-2"></div><div class="grid-box"></div>
-</div>
+</form></div>
+
 
 </body>
 </html>

@@ -1,4 +1,4 @@
-package servlet;
+package Servlet;
 
 import dao.UserDAO;
 import dao.ExerciseDao;

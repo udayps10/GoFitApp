@@ -6,7 +6,7 @@ import util.DBConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-
+import util.PasswordUtil;
 public class UserDAO {
 
     public boolean register(User user) {
@@ -16,7 +16,7 @@ public class UserDAO {
 
             ps.setString(1, user.getName());
             ps.setString(2, user.getEmail());
-            ps.setString(3, user.getPassword());
+            ps.setString(3, PasswordUtil.hashPassword(user.getPassword())); 
             ps.setInt(4, user.getAge());
             ps.setDouble(5, user.getWeightKg());
             ps.setDouble(6, user.getHeightCm());
@@ -31,16 +31,19 @@ public class UserDAO {
         }
     }
 
-    public User login(String email, String password) {
-        String sql = "SELECT * FROM users WHERE email = ? AND password = ?";
+    public User login(String email, String enteredpassword) {
+        String sql = "SELECT * FROM users WHERE email = ?"; 
         try (Connection con = DBConnection.getconnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, email);
-            ps.setString(2, password);
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
+                String hashedPassword = rs.getString("password");
+                if (!PasswordUtil.checkPassword(enteredpassword, hashedPassword)) {
+                    return null; 
+                }
                 User user = new User();
                 user.setId(rs.getInt("id"));
                 user.setName(rs.getString("name"));
@@ -57,5 +60,4 @@ public class UserDAO {
             e.printStackTrace();
         }
         return null;
-    }
-}
+    }}

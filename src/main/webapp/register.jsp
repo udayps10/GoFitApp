@@ -323,7 +323,8 @@
     </div>
     <span class="logo-name">GoFit</span>
   </div>
-
+<form id="registerForm" action="GoFit" method="post" onsubmit="return false;">
+<input type="hidden" name="action" value="register">
   <div class="progress-wrap">
     <div class="progress-bar active" id="p1"></div>
     <div class="progress-bar" id="p2"></div>
@@ -333,7 +334,7 @@
   <h2 id="slide-title">Create account</h2>
   <p class="subtitle" id="slide-sub">Your fitness journey starts here.</p>
 
-  <form onsubmit="return false;">
+  
     <div class="slides-outer">
       <div class="slides" id="slides">
 
@@ -438,11 +439,12 @@
 
       </div>
     </div>
-  </form>
+  
 
   <div class="footer">
     Already have an account? <a href="login.jsp">Log in</a>
   </div>
+    </form>
 </div>
 
 <script>
@@ -586,8 +588,9 @@
   /* ── Final submit ── */
   function handleSubmit() {
     if (!validateSlide2()) return;
-    alert('Account created! Welcome to GoFit.');
+    document.getElementById('register').submit();
   }
+
 </script>
 </body>
 </html>
