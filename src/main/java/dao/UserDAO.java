@@ -1,19 +1,15 @@
 package dao;
-
 import model.User;
 import util.DBConnection;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import util.PasswordUtil;
 public class UserDAO {
-
     public boolean register(User user) {
         String sql = "INSERT INTO users (name, email, password, age, weightKg, heightCm, goal, calorieGoal) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = DBConnection.getconnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-
             ps.setString(1, user.getName());
             ps.setString(2, user.getEmail());
             ps.setString(3, PasswordUtil.hashPassword(user.getPassword())); 
@@ -22,23 +18,18 @@ public class UserDAO {
             ps.setDouble(6, user.getHeightCm());
             ps.setString(7, user.getGoal());
             ps.setInt(8, user.getCalorieGoal());
-
             return ps.executeUpdate() > 0;
-
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
-
     public User login(String email, String enteredpassword) {
         String sql = "SELECT * FROM users WHERE email = ?"; 
         try (Connection con = DBConnection.getconnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
-
             if (rs.next()) {
                 String hashedPassword = rs.getString("password");
                 if (!PasswordUtil.checkPassword(enteredpassword, hashedPassword)) {
@@ -55,9 +46,26 @@ public class UserDAO {
                 user.setCalorieGoal(rs.getInt("calorieGoal"));
                 return user;
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
-    }}
+    }
+
+    // ── NEW: actually save an updated weight to the database. Without this,
+    // the dashboard's "Update Weight" modal only changed the number on screen
+    // and never touched the users table — so it looked saved but reset on
+    // every login/refresh. ──
+    public boolean updateWeight(int userId, double weightKg) {
+        String sql = "UPDATE users SET weightKg = ? WHERE id = ?";
+        try (Connection con = DBConnection.getconnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setDouble(1, weightKg);
+            ps.setInt(2, userId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+}

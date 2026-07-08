@@ -1,9 +1,34 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><!DOCTYPE html>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="model.User" %>
+<%
+    User currentUser = (User) session.getAttribute("user");
+    if (currentUser == null) {
+        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        return;
+    }
+    int calorieGoal = (currentUser.getCalorieGoal() > 0) ? currentUser.getCalorieGoal() : 2000;
+    // ── Date-nav support: which day are we actually showing? Set by the
+    // servlet based on ?date=yyyy-MM-dd; defaults to today if not supplied. ──
+    String selectedDateStr = (String) request.getAttribute("selectedDate");
+    if (selectedDateStr == null) selectedDateStr = java.time.LocalDate.now().toString();
+    Boolean isTodayAttr = (Boolean) request.getAttribute("isToday");
+    boolean isToday = (isTodayAttr != null) ? isTodayAttr : true;
+    Integer totalKcalAttr = (Integer) request.getAttribute("totalKcal");
+    Integer exerciseCountAttr = (Integer) request.getAttribute("exerciseCount");
+    int totalKcal = (totalKcalAttr != null) ? totalKcalAttr : 0;
+    int exerciseCount = (exerciseCountAttr != null) ? exerciseCountAttr : 0;
+    String displayName = (currentUser.getName() != null && !currentUser.getName().trim().isEmpty())
+        ? currentUser.getName().split(" ")[0] : "there";
+    double weightKgVal = currentUser.getWeightKg();
+    double heightCmVal = currentUser.getHeightCm();
+    String userGoal = (currentUser.getGoal() != null) ? currentUser.getGoal() : "Maintain Weight";
+%>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Uday Dashboard</title>
+<title> Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -527,15 +552,15 @@
     <div class="nav-brand">
       <span class="brand-icon">💪</span> GoFit
     </div>
-    <a href="userdashboard.jsp" class="nav-item active">
+    <a href="GoFit?page=dashboard" class="nav-item active">
       <span class="nav-icon">📊</span>
       <div><div>Dashboard</div></div>
     </a>
-    <a href="calorie.jsp" class="nav-item">
+    <a href="GoFit?page=calorie" class="nav-item">
       <span class="nav-icon">🍎</span>
       <div><div>Food Tracking</div></div>
     </a>
-    <a href="workout.jsp" class="nav-item">
+    <a href="GoFit?page=workout" class="nav-item">
       <span class="nav-icon">🏋️</span>
       <div><div>Workout</div></div>
     </a>
@@ -556,7 +581,7 @@
         <span></span><span></span><span></span>
       </button>
       <div>
-        <h1>Hi Uday 👋</h1>
+        <h1>Hi <%= displayName %> 👋</h1>
         <p id="hdr-sub">Let's crush your goals today!</p>
       </div>
     </div>
@@ -581,23 +606,23 @@
   <div class="stats-grid">
     <div class="stat-card">
       <span class="stat-icon">🔥</span>
-      <div class="stat-val">1500</div>
-      <div class="stat-sub">/ 2000 kcal</div>
-      <div class="stat-bar"><div class="stat-bar-fill" style="width:75%"></div></div>
+      <div class="stat-val" id="statKcal"><%= totalKcal %></div>
+      <div class="stat-sub">/ <%= calorieGoal %> kcal</div>
+      <div class="stat-bar"><div class="stat-bar-fill" id="statKcalBar" style="width:<%= Math.min(100, (int)(100.0 * totalKcal / calorieGoal)) %>%"></div></div>
       <div class="stat-lbl">Calories</div>
     </div>
     <div class="stat-card">
       <span class="stat-icon">💪</span>
-      <div class="stat-val">2</div>
+      <div class="stat-val" id="statExercises"><%= exerciseCount %></div>
       <div class="stat-sub">exercises done</div>
-      <div class="stat-bar"><div class="stat-bar-fill" style="width:40%"></div></div>
+      <div class="stat-bar"><div class="stat-bar-fill" style="width:<%= Math.min(100, exerciseCount * 20) %>%"></div></div>
       <div class="stat-lbl">Workouts</div>
     </div>
     <div class="stat-card">
       <span class="stat-icon">👟</span>
-      <div class="stat-val">6k</div>
-      <div class="stat-sub">/ 10k steps</div>
-      <div class="stat-bar"><div class="stat-bar-fill" style="width:60%"></div></div>
+      <div class="stat-val">—</div>
+      <div class="stat-sub">step tracking n/a</div>
+      <div class="stat-bar"><div class="stat-bar-fill" style="width:0%"></div></div>
       <div class="stat-lbl">Steps</div>
     </div>
   </div>
@@ -605,10 +630,23 @@
   <!-- GOAL CARD -->
   <div class="goal-card">
     <div class="goal-title">🎯 Daily Goal</div>
-    <div class="goal-nums">1500 <span>/ 2000 kcal</span></div>
-    <div class="goal-rem">500 kcal remaining</div>
-    <div class="goal-bar"><div class="goal-bar-fill" style="width:75%"></div></div>
-    <div class="goal-msg">💪 Halfway there! You got this!</div>
+    <div class="goal-nums" id="goalNums"><%= totalKcal %> <span>/ <%= calorieGoal %> kcal</span></div>
+    <div class="goal-rem" id="goalRem"><%= Math.max(0, calorieGoal - totalKcal) %> kcal remaining</div>
+    <div class="goal-bar"><div class="goal-bar-fill" id="goalBarFill" style="width:<%= Math.min(100, (int)(100.0 * totalKcal / calorieGoal)) %>%"></div></div>
+    <div class="goal-msg" id="goalMsg">
+      <%
+        double pct = (double) totalKcal / calorieGoal;
+        if (totalKcal >= calorieGoal) {
+      %>You've hit your goal for today! 🎉<%
+        } else if (pct >= 0.45 && pct < 0.65) {
+      %>💪 Halfway there! You got this!<%
+        } else if (totalKcal == 0) {
+      %>Log your first meal to get started.<%
+        } else {
+      %>Keep going — you're making progress.<%
+        }
+      %>
+    </div>
   </div>
 
   <!-- AI INSIGHT (full width) -->
@@ -620,8 +658,8 @@
           <div class="ai-sublbl">Personalised for today</div>
         </div>
       </div>
-      <div class="ai-body">
-        You've consumed <strong style="color:#c084fc">1500 kcal</strong> with <strong style="color:#c084fc">500 kcal</strong> remaining. Based on your workout, try a protein-rich meal for recovery. You can still eat:
+      <div class="ai-body" id="aiBody">
+        You've consumed <strong style="color:#c084fc"><%= totalKcal %> kcal</strong> with <strong style="color:#c084fc"><%= Math.max(0, calorieGoal - totalKcal) %> kcal</strong> remaining. Based on your goal (<%= userGoal %>), here are some options:
       </div>
       <div class="ai-pills">
         <span class="ai-pill">🥚 2 eggs + toast ~280 kcal</span>
@@ -646,51 +684,21 @@
     </div>
   </div>
 
-  <!-- FOOD LOG -->
+  <!-- FOOD LOG (today's items pulled from the server on Food Tracking page; this dashboard just adds new entries which persist immediately) -->
   <div class="section-card">
-    <div class="section-title">🥗 Food Log</div>
-    <div id="food-list">
-      <div class="food-item">
-        <div><div class="fi-name">Oatmeal with Berries</div><div class="fi-cal">320 kcal</div></div>
-        <button class="rm-btn" onclick="removeItem(this)">×</button>
-      </div>
-      <div class="food-item">
-        <div><div class="fi-name">Grilled Chicken Salad</div><div class="fi-cal">450 kcal</div></div>
-        <button class="rm-btn" onclick="removeItem(this)">×</button>
-      </div>
-      <div class="food-item">
-        <div><div class="fi-name">Protein Bar</div><div class="fi-cal">200 kcal</div></div>
-        <button class="rm-btn" onclick="removeItem(this)">×</button>
-      </div>
-    </div>
+    <div class="section-title">🥗 Quick-Add Food</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">
+      Items you add here are saved immediately. See your full list on the <a href="GoFit?page=calorie" style="color:var(--green);">Food Tracking</a> page.
+    </p>
     <button class="add-btn" id="add-food-btn" onclick="openModal('food')">+ Add Food</button>
   </div>
 
-  <!-- WORKOUT LOG -->
+  <!-- WORKOUT LOG (same — real add persists via GoFit servlet; full history on Workout page) -->
   <div class="section-card">
-    <div class="section-title">🏋️ Workout Log</div>
-    <div id="workout-list">
-      <div class="ex-item done">
-        <div class="ex-info">
-          <div class="ex-name">Bench Press</div>
-          <div class="ex-det">3 sets × 10 reps × 135 lbs</div>
-        </div>
-        <div class="ex-right">
-          <button class="done-btn is-done" onclick="toggleDone(this)">✓ Done</button>
-          <button class="rm-btn" onclick="removeItem(this)">×</button>
-        </div>
-      </div>
-      <div class="ex-item">
-        <div class="ex-info">
-          <div class="ex-name">Squats</div>
-          <div class="ex-det">4 sets × 8 reps × 185 lbs</div>
-        </div>
-        <div class="ex-right">
-          <button class="done-btn" onclick="toggleDone(this)">Pending</button>
-          <button class="rm-btn" onclick="removeItem(this)">×</button>
-        </div>
-      </div>
-    </div>
+    <div class="section-title">🏋️ Quick-Add Workout</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">
+      Items you add here are saved immediately. See your full list on the <a href="GoFit?page=workout" style="color:var(--green);">Workout</a> page.
+    </p>
     <button class="add-btn" id="add-workout-btn" onclick="openModal('workout')">+ Add Exercise</button>
   </div>
 
@@ -699,7 +707,7 @@
     <div class="body-card">
       <div class="body-card-title">⚖️ Weight</div>
       <div class="body-val-row">
-        <div class="body-val" id="weight-val">89 <small>kg</small></div>
+        <div class="body-val" id="weight-val"><%= (weightKgVal > 0) ? weightKgVal : "—" %> <small>kg</small></div>
         <button class="upd-btn" onclick="openModal('weight')">Update</button>
       </div>
       <div class="bmi-section">
@@ -712,14 +720,14 @@
       <div class="body-card-title">🎯 Goal</div>
       <div class="body-val-row">
         <div>
-          <div class="body-val" style="font-size:20px; line-height:1.2;" id="goal-display">Maintain Weight</div>
-          <div style="font-size:12px; color:var(--muted); margin-top:4px;" id="goal-desc">Stay at current calorie balance</div>
+          <div class="body-val" style="font-size:20px; line-height:1.2;" id="goal-display"><%= userGoal %></div>
+          <div style="font-size:12px; color:var(--muted); margin-top:4px;" id="goal-desc"></div>
         </div>
         <button class="upd-btn" onclick="openModal('goal')">Change</button>
       </div>
       <div class="bmi-section">
         <div class="bmi-lbl">Current target</div>
-        <div class="bmi-hint" id="goal-hint">2000 kcal / day</div>
+        <div class="bmi-hint" id="goal-hint"><%= calorieGoal %> kcal / day</div>
       </div>
     </div>
   </div>
@@ -786,7 +794,7 @@
     <input type="text" id="ex-name" placeholder="Exercise name" />
     <input type="number" id="ex-sets" placeholder="Sets" />
     <input type="number" id="ex-reps" placeholder="Reps" />
-    <input type="number" id="ex-weight" placeholder="Weight (kg/lbs)" />
+    <input type="number" id="ex-weight" placeholder="Weight (kg)" />
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal('workout')">Cancel</button>
       <button class="btn-save" onclick="saveWorkout()">Add</button>
@@ -844,8 +852,13 @@
 </div>
 		
 			<script>
-  /* ===== YOUR API KEY ===== */
-  var GEMINI_KEY = 'YOUR_GEMINI_API_KEY_HERE';
+  /* ===== Note: AI scan now calls the GoFit servlet proxy — no API key lives in the browser ===== */
+
+  /* ===== SERVER-PROVIDED STATE (from the JSP scriptlet above) ===== */
+  var GOAL = <%= calorieGoal %>;
+  var CONSUMED_KCAL = <%= totalKcal %>;
+  var heightCm = <%= heightCmVal %>;
+  var weightKg = <%= (weightKgVal > 0) ? weightKgVal : 0 %>;
 
   /* ===== HAMBURGER MENU ===== */
   function toggleMenu() {
@@ -858,20 +871,26 @@
   }
 
   /* ===== STATE ===== */
-  var weightKg = 89, heightCm = 0;
   var camStream = null, capturedB64 = null, capturedMime = 'image/jpeg';
   var scannedItems = [];
 
   /* ===== DATE LOGIC =====
-     offset = days from today (0 = today, -1 = yesterday, never > 0)
-     Midnight crossing: check every minute; if local date has changed, refresh display
+     Now backed by the server: SELECTED_DATE/IS_TODAY come from the servlet
+     (via ?date=yyyy-MM-dd), and navigating a day reloads the page so the
+     kcal/exercise stats you see are the REAL numbers for that day — not
+     just today's numbers with a different label.
   */
-  var offset = 0;
+  var SELECTED_DATE = "<%= selectedDateStr %>"; // yyyy-MM-dd
+  var IS_TODAY = <%= isToday %>;
 
   function getLocalDateStr(d) {
     return d.getFullYear() + '-' +
       String(d.getMonth()+1).padStart(2,'0') + '-' +
       String(d.getDate()).padStart(2,'0');
+  }
+  function parseLocalDate(str) {
+    var parts = str.split('-');
+    return new Date(parseInt(parts[0],10), parseInt(parts[1],10)-1, parseInt(parts[2],10));
   }
 
   var todayStr = getLocalDateStr(new Date());
@@ -880,42 +899,36 @@
     var nowStr = getLocalDateStr(new Date());
     if (nowStr !== todayStr) {
       todayStr = nowStr;
-      // If user was viewing "today" (offset 0), they stay on today (new date)
-      updateDateDisplay();
+      if (IS_TODAY) location.reload(); // new day — reload to pull fresh totals from the server
     }
   }
   setInterval(checkMidnight, 60000); // check every minute
 
   function changeDay(dir) {
-    var newOffset = offset + dir;
-    if (newOffset > 0) return; // block future dates
-    offset = newOffset;
-    updateDateDisplay();
+    var d = parseLocalDate(SELECTED_DATE);
+    d.setDate(d.getDate() + dir);
+    var newDateStr = getLocalDateStr(d);
+    if (newDateStr > todayStr) return; // block future dates
+    window.location.href = 'GoFit?page=dashboard&date=' + newDateStr;
   }
 
   function updateDateDisplay() {
-    var d = new Date();
-    d.setDate(d.getDate() + offset);
-    var isPast = offset < 0;
+    var d = parseLocalDate(SELECTED_DATE);
+    var isPast = !IS_TODAY;
 
-    // Label
-    var label;
-    if (offset === 0) label = 'Today';
-    else if (offset === -1) label = 'Yesterday';
-    else label = d.toLocaleDateString('en-US', {weekday: 'long'});
+    var yestDate = new Date(); yestDate.setDate(yestDate.getDate() - 1);
+    var yestStr = getLocalDateStr(yestDate);
+
+    var label = IS_TODAY ? 'Today' : (SELECTED_DATE === yestStr ? 'Yesterday' : d.toLocaleDateString('en-US', {weekday: 'long'}));
 
     document.getElementById('date-label').textContent = label;
     document.getElementById('date-sub').textContent = d.toLocaleDateString('en-US', {
       month: 'short', day: 'numeric', year: 'numeric'
     });
 
-    // Next button — always disabled when on today or future
-    document.getElementById('btn-next').disabled = (offset >= 0);
-
-    // Past notice banner
+    document.getElementById('btn-next').disabled = IS_TODAY;
     document.getElementById('past-notice').style.display = isPast ? 'block' : 'none';
 
-    // Disable food/workout actions for past days
     var foodBtn = document.getElementById('qa-food');
     var workoutBtn = document.getElementById('qa-workout');
     var addFood = document.getElementById('add-food-btn');
@@ -928,16 +941,16 @@
     addFood.disabled = isPast;
     addWorkout.disabled = isPast;
 
-    // Header subtext
     document.getElementById('hdr-sub').textContent = isPast
-      ? 'Viewing ' + d.toLocaleDateString('en-US', {month: 'short', day: 'numeric'})
+      ? 'Viewing ' + d.toLocaleDateString('en-US', {month: 'short', day: 'numeric'}) + ' (read-only — logging is disabled for past days)'
       : "Let's crush your goals today!";
   }
   updateDateDisplay();
+  updateBMI();
 
   /* ===== MODALS ===== */
   function openModal(t) {
-    if ((t === 'food' || t === 'workout') && offset < 0) return; // block past day logging
+    if ((t === 'food' || t === 'workout') && !IS_TODAY) return;
     document.getElementById('modal-' + t).classList.add('open');
   }
   function closeModal(t) {
@@ -962,56 +975,69 @@
     if (tab !== 'scan') resetCam();
   }
 
-  /* ===== REMOVE ITEMS ===== */
-  function removeItem(btn) {
-    btn.closest('.food-item, .ex-item').remove();
-  }
-
-  /* ===== SAVE FOOD ===== */
+  /* ===== SAVE FOOD (persists to DB via GoFit servlet, then reloads for fresh totals) ===== */
   function saveFood() {
     var name = document.getElementById('food-name').value.trim();
     var cal = document.getElementById('food-cal').value.trim();
-    if (!name) return;
-    var item = document.createElement('div');
-    item.className = 'food-item';
-    item.innerHTML = '<div><div class="fi-name">' + esc(name) + '</div><div class="fi-cal">' + (cal ? cal + ' kcal' : '') + '</div></div><button class="rm-btn" onclick="removeItem(this)">×</button>';
-    document.getElementById('food-list').appendChild(item);
-    document.getElementById('food-name').value = '';
-    document.getElementById('food-cal').value = '';
-    closeModal('food');
+    if (!name || !cal) { alert('Please enter a food name and calories'); return; }
+    persistFood(name, '1 serving', cal, 0, 0, 0);
   }
 
-  /* ===== WORKOUT ===== */
-  function toggleDone(btn) {
-    var item = btn.closest('.ex-item');
-    var isDone = item.classList.contains('done');
-    item.classList.toggle('done', !isDone);
-    btn.classList.toggle('is-done', !isDone);
-    btn.textContent = isDone ? 'Pending' : '✓ Done';
+  function persistFood(name, serving, kcal, carbs, protein, fat) {
+    fetch('GoFit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'action=addCalorie'
+          + '&foodName=' + encodeURIComponent(name)
+          + '&serving=' + encodeURIComponent(serving || '1 serving')
+          + '&kcal=' + encodeURIComponent(kcal || 0)
+          + '&carbsG=' + encodeURIComponent(carbs || 0)
+          + '&proteinG=' + encodeURIComponent(protein || 0)
+          + '&fatG=' + encodeURIComponent(fat || 0)
+    }).then(function(res) {
+      if (!res.ok) throw new Error('Server returned ' + res.status);
+      document.getElementById('food-name').value = '';
+      document.getElementById('food-cal').value = '';
+      closeModal('food');
+      location.reload(); // refresh dashboard totals from server
+    }).catch(function(err) { alert('Could not save: ' + err.message); });
   }
 
+  /* ===== SAVE WORKOUT (persists to DB via GoFit servlet, then reloads) ===== */
   function saveWorkout() {
     var name = document.getElementById('ex-name').value.trim();
-    var sets = document.getElementById('ex-sets').value;
-    var reps = document.getElementById('ex-reps').value;
-    var wt = document.getElementById('ex-weight').value;
-    if (!name) return;
-    var item = document.createElement('div');
-    item.className = 'ex-item';
-    item.innerHTML = '<div class="ex-info"><div class="ex-name">' + esc(name) + '</div><div class="ex-det">' + sets + ' sets × ' + reps + ' reps × ' + wt + ' lbs</div></div><div class="ex-right"><button class="done-btn" onclick="toggleDone(this)">Pending</button><button class="rm-btn" onclick="removeItem(this)">×</button></div>';
-    document.getElementById('workout-list').appendChild(item);
-    ['ex-name','ex-sets','ex-reps','ex-weight'].forEach(function(id) { document.getElementById(id).value = ''; });
-    closeModal('workout');
+    var reps = document.getElementById('ex-reps').value || 0;
+    var wt = document.getElementById('ex-weight').value || 0;
+    if (!name) { alert('Please enter an exercise name'); return; }
+    fetch('GoFit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'action=addExercise'
+          + '&exerciseName=' + encodeURIComponent(name)
+          + '&weightKg=' + encodeURIComponent(wt)
+          + '&reps=' + encodeURIComponent(reps)
+    }).then(function(res) {
+      if (!res.ok) throw new Error('Server returned ' + res.status);
+      ['ex-name','ex-sets','ex-reps','ex-weight'].forEach(function(id) { document.getElementById(id).value = ''; });
+      closeModal('workout');
+      location.reload();
+    }).catch(function(err) { alert('Could not save: ' + err.message); });
   }
 
   /* ===== WEIGHT + HEIGHT + BMI ===== */
   function saveWeight() {
     var val = parseFloat(document.getElementById('new-weight').value);
     if (!val) return;
-    weightKg = val;
-    document.getElementById('weight-val').innerHTML = val + ' <small>kg</small>';
-    document.getElementById('new-weight').value = '';
-    closeModal('weight');
+    fetch('GoFit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'action=updateWeight&weightKg=' + encodeURIComponent(val)
+    }).then(function(res) {
+      if (!res.ok) throw new Error('Server returned ' + res.status);
+      document.getElementById('new-weight').value = '';
+      closeModal('weight');
+      location.reload(); // refresh so weight + BMI reflect the saved value from the server
+    }).catch(function(err) { alert('Could not save weight: ' + err.message); });
   }
 
   /* ===== GOAL ===== */
@@ -1037,6 +1063,9 @@
     document.getElementById('goal-desc').textContent = d.desc;
     document.getElementById('goal-hint').textContent = d.hint;
     closeModal('goal');
+    /* Note: no servlet action exists yet to persist goal changes —
+       this updates the on-screen value only until a real
+       "updateGoal" endpoint is added. */
   }
 
   function updateBMI() {
@@ -1144,41 +1173,26 @@
     }
   }
 
-  /* ===== GEMINI AI SCAN ===== */
+  /* ===== AI SCAN — now via the GoFit servlet proxy, no API key in the browser ===== */
   function doScan() {
     if (!capturedB64) return;
     setScanLoad(true);
     hideScanResult();
-    var prompt = 'You are a nutrition expert. Identify ALL food items in this image.\nReturn ONLY a JSON array:\n[{"name":"Food","serving":"1 cup","kcal":250},...]\nIf no food: []\nBe realistic with Indian home-cooked portions.';
-    fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + GEMINI_KEY, {
+    fetch('GoFit?action=aiScanFood', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: capturedMime, data: capturedB64 } }] }]
-      })
+      body: JSON.stringify({ imageBase64: capturedB64, mimeType: capturedMime })
     })
-    .then(function(r) {
-      if (!r.ok) return r.json().then(function(e) { throw new Error(e.error && e.error.message || 'API error'); });
-      return r.json();
-    })
+    .then(function(r) { return r.json(); })
     .then(function(d) {
       setScanLoad(false);
-      var text = d.candidates && d.candidates[0] && d.candidates[0].content && d.candidates[0].content.parts && d.candidates[0].content.parts[0] && d.candidates[0].content.parts[0].text;
-      if (!text) throw new Error('Empty response from AI');
-      showScanResult(text);
+      if (d.error) { alert('AI error: ' + d.error); return; }
+      showScanResult(d.items || []);
     })
     .catch(function(err) { setScanLoad(false); alert('AI error: ' + err.message); });
   }
 
-  function showScanResult(text) {
-    var clean = text.replace(/```json/gi, '').replace(/```/g, '').trim();
-    var items;
-    try { items = JSON.parse(clean); }
-    catch(e) {
-      var m = clean.match(/\[[\s\S]*\]/);
-      try { items = m ? JSON.parse(m[0]) : []; }
-      catch(e2) { items = []; }
-    }
+  function showScanResult(items) {
     scannedItems = Array.isArray(items) ? items : [];
     if (!scannedItems.length) { alert('No food detected — try a clearer photo'); return; }
     var html = '', total = 0;
@@ -1194,16 +1208,29 @@
   }
 
   function logScanned() {
-    scannedItems.forEach(function(item) {
-      var el = document.createElement('div');
-      el.className = 'food-item';
-      el.innerHTML = '<div><div class="fi-name">' + esc(item.name) + '</div><div class="fi-cal">' + (item.kcal || 0) + ' kcal</div></div><button class="rm-btn" onclick="removeItem(this)">×</button>';
-      document.getElementById('food-list').appendChild(el);
+    var saves = scannedItems.map(function(item) {
+      return fetch('GoFit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'action=addCalorie'
+            + '&foodName=' + encodeURIComponent(item.name || 'Food')
+            + '&serving=' + encodeURIComponent(item.serving || '1 serving')
+            + '&kcal=' + encodeURIComponent(parseInt(item.kcal) || 0)
+            + '&carbsG=' + encodeURIComponent(parseFloat(item.carbs) || 0)
+            + '&proteinG=' + encodeURIComponent(parseFloat(item.protein) || 0)
+            + '&fatG=' + encodeURIComponent(parseFloat(item.fat) || 0)
+      }).then(function(res) {
+        if (!res.ok) throw new Error('Server returned ' + res.status);
+        return res;
+      });
     });
-    scannedItems = [];
-    hideScanResult();
-    resetCam();
-    closeModal('food');
+    Promise.all(saves).then(function() {
+      scannedItems = [];
+      hideScanResult();
+      resetCam();
+      closeModal('food');
+      location.reload();
+    }).catch(function(err) { alert('Some items failed to save: ' + err.message); });
   }
 
   function hideScanResult() {

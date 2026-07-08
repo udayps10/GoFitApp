@@ -2,6 +2,7 @@ package dao;
 import model.CalorieLog;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -64,6 +65,23 @@ return status;
         }
         return 0;
     }
+
+    // ── NEW: same as totalKcalToday but for any given date (used for date-nav / "past days") ──
+    public int totalKcalByDate(int userId, Date date) {
+        String sql = "SELECT SUM(kcal) FROM calorieLogs WHERE userId = ? AND logDate = ?";
+        try (Connection conn = DBConnection.getconnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            ps.setDate(2, date);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt(1);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
     
     public List<CalorieLog> findByUserToday(int userId) {
         String sql = "SELECT * FROM calorieLogs WHERE userId = ? AND logDate = CURDATE() ORDER BY createdAt DESC";
@@ -87,6 +105,36 @@ return status;
                 list.add(log);
             }
  
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    // ── NEW: same as findByUserToday but for any given date (used for date-nav / "past days") ──
+    public List<CalorieLog> findByUserAndDate(int userId, Date date) {
+        String sql = "SELECT * FROM calorieLogs WHERE userId = ? AND logDate = ? ORDER BY createdAt DESC";
+        List<CalorieLog> list = new ArrayList<>();
+        try (Connection conn = DBConnection.getconnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            ps.setDate(2, date);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                CalorieLog log = new CalorieLog();
+                log.setId(rs.getInt("id"));
+                log.setUserId(rs.getInt("userId"));
+                log.setFoodName(rs.getString("foodName"));
+                log.setServing(rs.getString("serving"));
+                log.setKcal(rs.getInt("kcal"));
+                log.setCarbsG(rs.getDouble("carbsG"));
+                log.setProteinG(rs.getDouble("proteinG"));
+                log.setFatG(rs.getDouble("fatG"));
+                log.setLogDate(rs.getDate("logDate"));
+                list.add(log);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -343,20 +343,20 @@
 
           <div class="field">
             <label for="fullname">Full Name</label>
-            <input type="text" id="fullname" placeholder="Alex Johnson" autocomplete="name">
+            <input type="text" id="fullname" name="name" placeholder="Alex Johnson" autocomplete="name">
             <span class="err-msg" id="err-fullname">Full name is required.</span>
           </div>
 
           <div class="field">
             <label for="email">Email</label>
-            <input type="email" id="email" placeholder="alex@example.com" autocomplete="email">
+            <input type="email" id="email" name="email" placeholder="alex@example.com" autocomplete="email">
             <span class="err-msg" id="err-email">Enter a valid email address.</span>
           </div>
 
           <div class="field">
             <label for="pw1">Password</label>
             <div class="input-wrap">
-              <input type="password" id="pw1" placeholder="Min. 8 characters" autocomplete="new-password">
+              <input type="password" id="pw1" name="password" placeholder="Min. 8 characters" autocomplete="new-password">
               <button type="button" class="eye-btn" onclick="togglePw('pw1','eye1','eyeoff1')" tabindex="-1">
                 <svg id="eye1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
@@ -381,7 +381,7 @@
           <div class="field">
             <label for="pw2">Confirm Password</label>
             <div class="input-wrap">
-              <input type="password" id="pw2" placeholder="Repeat password" autocomplete="new-password">
+              <input type="password" id="pw2" name="confirmPassword" placeholder="Repeat password" autocomplete="new-password">
               <button type="button" class="eye-btn" onclick="togglePw('pw2','eye2','eyeoff2')" tabindex="-1">
                 <svg id="eye2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
@@ -405,25 +405,25 @@
           <div class="row">
             <div class="field">
               <label for="age">Age</label>
-              <input type="number" id="age" placeholder="25" min="10" max="100">
+              <input type="number" id="age" name="age" placeholder="25" min="10" max="100">
               <span class="err-msg" id="err-age">Enter a valid age (10–100).</span>
             </div>
             <div class="field">
               <label for="weight">Weight (kg)</label>
-              <input type="number" id="weight" placeholder="70" min="20" max="300">
+              <input type="number" id="weight" name="weightKg" placeholder="70" min="20" max="300">
               <span class="err-msg" id="err-weight">Enter a valid weight.</span>
             </div>
           </div>
 
           <div class="field">
             <label for="height">Height (cm)</label>
-            <input type="number" id="height" placeholder="175" min="50" max="250">
+            <input type="number" id="height" name="heightCm" placeholder="175" min="50" max="250">
             <span class="err-msg" id="err-height">Enter a valid height.</span>
           </div>
 
           <div class="field">
             <label for="goal">Fitness Goal</label>
-            <select id="goal">
+            <select id="goal" name="goal">
               <option value="Lose Fat">Lose Fat</option>
               <option value="Build Muscle">Build Muscle</option>
               <option value="Maintain Weight" selected>Maintain Weight</option>
@@ -588,7 +588,7 @@
   /* ── Final submit ── */
   function handleSubmit() {
     if (!validateSlide2()) return;
-    document.getElementById('register').submit();
+    document.getElementById('registerForm').submit();
   }
 
 </script>

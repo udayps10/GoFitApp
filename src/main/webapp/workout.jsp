@@ -1,4 +1,19 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%> 
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="model.ExerciseLog, model.User, java.util.List" %>
+<%
+    User currentUser = (User) session.getAttribute("user");
+    if (currentUser == null) {
+        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        return;
+    }
+    List<ExerciseLog> exerciseLogs = (List<ExerciseLog>) request.getAttribute("exerciseLogs");
+    // ── Date-nav support: which day's logs are we actually showing? Set by the
+    // servlet based on ?date=yyyy-MM-dd; defaults to today if not supplied. ──
+    String selectedDateStr = (String) request.getAttribute("selectedDate");
+    if (selectedDateStr == null) selectedDateStr = java.time.LocalDate.now().toString();
+    Boolean isTodayAttr = (Boolean) request.getAttribute("isToday");
+    boolean isToday = (isTodayAttr != null) ? isTodayAttr : true;
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -37,44 +52,33 @@
   .lvl-3 { background: #26a641; }
   .lvl-4 { background: #39d353; box-shadow: 0 0 10px rgba(57, 211, 83, 0.2); }
 
-  /* ---- NAVBAR ---- */
-  nav {
-    background: #0b1220;
-    border-bottom: 1px solid rgba(255,255,255,0.07);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 24px;
-    height: 58px;
-  }
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.2rem;
-  }
-  .logo-box {
-    width: 32px;
-    height: 32px;
-    background: #4ade80;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-  }
-  .nav-badge {
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: #4ade80;
-    background: rgba(74,222,128,0.1);
-    border: 1px solid rgba(74,222,128,0.25);
-    padding: 4px 12px;
-    border-radius: 20px;
-  }
+  /* ---- NAVBAR (matches calorie.jsp) ---- */
+  nav { background: #0b1220; border-bottom: 1px solid rgba(255,255,255,0.07); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; height: 58px; position: sticky; top: 0; z-index: 200; }
+  .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .logo-box { width: 32px; height: 32px; background: #4ade80; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+  .logo-text { font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: #f0f4f8; }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+  .ham-btn { background: none; border: none; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; width: 36px; height: 36px; padding: 4px; border-radius: 8px; transition: background 0.15s; flex-shrink: 0; }
+  .ham-btn:hover { background: rgba(255,255,255,0.06); }
+  .ham-btn span { display: block; width: 22px; height: 2px; background: #f0f4f8; border-radius: 2px; transition: transform 0.25s, opacity 0.2s; transform-origin: center; }
+  .ham-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .ham-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .ham-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  .nav-dropdown { position: absolute; top: 58px; left: 20px; background: #0b1220; border: 1px solid rgba(255,255,255,0.10); border-radius: 14px; min-width: 210px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); display: none; flex-direction: column; overflow: hidden; z-index: 199; animation: dropIn 0.18s ease; }
+  @keyframes dropIn { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+  .nav-dropdown.open { display: flex; }
+  .nav-brand-row { display: flex; align-items: center; gap: 8px; padding: 14px 16px 10px; border-bottom: 1px solid rgba(255,255,255,0.07); font-size: 15px; font-weight: 700; color: #f0f4f8; }
+  .nav-brand-icon { background: #4ade80; color: #000; padding: 3px 7px; border-radius: 6px; font-size: 14px; }
+  .nav-dropdown a { display: flex; align-items: center; gap: 10px; color: #5a7291; text-decoration: none; font-size: 0.92rem; font-weight: 600; padding: 11px 16px; transition: color 0.15s, background 0.15s; }
+  .nav-dropdown a .nav-icon { font-size: 17px; width: 22px; text-align: center; }
+  .nav-dropdown a:hover { color: #f0f4f8; background: rgba(255,255,255,0.05); }
+  .nav-dropdown a.active { color: #4ade80; background: rgba(74,222,128,0.08); }
+  .nav-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 4px 0; }
+  .nav-logout { display: flex; align-items: center; gap: 10px; padding: 11px 16px 14px; font-size: 0.92rem; font-weight: 600; color: #f87171; cursor: pointer; transition: background 0.15s; }
+  .nav-logout:hover { background: rgba(248,113,113,0.07); }
+  .nav-logout .nav-icon { font-size: 17px; width: 22px; text-align: center; }
+  .nav-overlay { position: fixed; inset: 0; z-index: 198; display: none; }
+  .nav-overlay.open { display: block; }
 
   /* ---- PAGE WRAPPER ---- */
   main {
@@ -530,18 +534,32 @@
         fill="#0d1a0e" fill-opacity="0.9"/>
   <path d="M0 862 C240 840, 480 875, 720 855 C960 835, 1200 868, 1440 850"
         fill="none" stroke="#4ade80" stroke-width="1.2" stroke-opacity="0.18"/>
-
+</svg>
 <!-- NAVBAR -->
 <nav>
-  <div class="logo">
-    <button class="menu-btn" onclick="toggleSidebar()" style="background:none;border:none;color:#f0f4f8;font-size:1.5rem;cursor:pointer;margin-right:10px;">☰</button>
-    <div class="logo-box">💪</div>GoFit
-  </div>
+  <a href="GoFit?page=dashboard" class="nav-brand">
+    <div class="logo-box">💪</div>
+    <span class="logo-text">GoFit</span>
+  </a>
   <div class="nav-right">
-    <button class="user-btn">👤</button>
-    <button class="logout-btn" onclick="logout()">Log out</button>
+    <button class="ham-btn" id="hamBtn" onclick="toggleNav()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
+
+<div class="nav-overlay" id="navOverlay" onclick="closeNav()"></div>
+
+<div class="nav-dropdown" id="navDropdown">
+  <div class="nav-brand-row">
+    <span class="nav-brand-icon">💪</span> GoFit
+  </div>
+  <a href="GoFit?page=dashboard"><span class="nav-icon">📊</span> Dashboard</a>
+  <a href="GoFit?page=calorie"><span class="nav-icon">🍎</span> Food Tracking</a>
+  <a href="GoFit?page=workout" class="active"><span class="nav-icon">🏋️</span> Workout</a>
+  <div class="nav-divider"></div>
+  <div class="nav-logout" onclick="logout()"><span class="nav-icon">🚪</span> Logout</div>
+</div>
 
 <!-- MAIN -->
 <main>
@@ -553,52 +571,36 @@
       <span id="dateLabel"></span>
       <button class="arrow-btn" id="btnNext" onclick="changeDay(1)">&#8250;</button>
     </div>
+    <% if (!isToday) { %>
+    <div style="margin-top:10px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.2);border-radius:8px;padding:8px 12px;font-size:0.8rem;color:#4ade80;">
+      📅 Viewing past data — logging is disabled for previous days.
+    </div>
+    <% } %>
   </div>
 
-  <!-- AI INSIGHT CARD -->
-  <div class="ai-insight-card" id="aiInsightCard">
-    <div class="ai-halfway-banner" id="halfwayBanner">💪 Halfway there! You got this!</div>
-    <div class="ai-insight-header">
-      <div class="ai-insight-icon">🤖</div>
-      <div class="ai-insight-title-block">
-        <div class="ai-insight-label">AI Insight</div>
-        <div class="ai-insight-subtitle">Personalised for today</div>
-      </div>
-    </div>
-    <div class="ai-insight-text" id="aiInsightText">
-      Start logging your meals to get personalised AI recommendations for the day.
-    </div>
-    <div class="ai-insight-chips" id="aiInsightChips">
-      <div class="ai-chip" onclick="quickLog('2 eggs + toast','1 plate',280,30,16,10)">
-        <span class="ai-chip-emoji">🥚</span> 2 eggs + toast ~280 kcal
-      </div>
-      <div class="ai-chip" onclick="quickLog('Rice + dal','1 bowl',420,60,18,8)">
-        <span class="ai-chip-emoji">🍛</span> Rice + dal ~420 kcal
-      </div>
-      <div class="ai-chip" onclick="quickLog('Peanut butter + banana','1 serving',310,38,10,13)">
-        <span class="ai-chip-emoji">🥜</span> Peanut butter + banana
-      </div>
-    </div>
-  </div>
-
-  <!-- ADD -->
+  <!-- LOG EXERCISE FORM (only shown when viewing today; past days are read-only) -->
+  <% if (isToday) { %>
   <div class="card">
     <div class="card-label">Log Exercise</div>
+    <form action="GoFit" method="post">
+      <input type="hidden" name="action" value="addExercise">
+      <div class="input-labels">
+        <span class="name-lbl">Exercise</span>
+        <span>kg</span>
+        <span>Reps</span>
+      </div>
 
-    <div class="input-labels">
-      <span class="name-lbl">Exercise</span>
-      <span>kg</span>
-      <span>Reps</span>
-    </div>
+      <div class="input-row">
+        <input name="exerciseName" id="name"   placeholder="e.g. Bench Press" style="flex:2" required list="exerciseSuggestions" autocomplete="off">
+        <datalist id="exerciseSuggestions"></datalist>
+        <input name="weightKg"     id="weight" type="number" value="0" step="0.5">
+        <input name="reps"         id="reps"   type="number" value="10">
+      </div>
 
-    <div class="input-row">
-      <input id="name"   placeholder="e.g. Bench Press" style="flex:2">
-      <input id="weight" type="number" value="0">
-      <input id="reps"   type="number" value="10">
-    </div>
-
-    <button class="btn-add" onclick="addExercise()">+ Add Exercise</button>
+      <button type="submit" class="btn-add">+ Add Exercise</button>
+    </form>
   </div>
+  <% } %>
 
   <!-- LIST -->
   <div class="card">
@@ -642,35 +644,690 @@
 <script>
 
   /* ---------- DATA ---------- */
+  var todayExercises = [
+<%
+    if (exerciseLogs != null) {
+        for (int i = 0; i < exerciseLogs.size(); i++) {
+            ExerciseLog log = exerciseLogs.get(i);
+            String exName = log.getExerciseName() != null ? log.getExerciseName().replace("\"", "\\\"").replace("'", "\\'") : "";
+%>
+    { id: <%= log.getId() %>, name: "<%= exName %>", weight: <%= log.getWeightKg() %>, reps: <%= log.getReps() %> }<%= (i < exerciseLogs.size() - 1) ? "," : "" %>
+<%
+        }
+    }
+%>
+  ];
+  // ── Server-provided date state (from ?date=yyyy-MM-dd, defaults to today) ──
+  var SELECTED_DATE = "<%= selectedDateStr %>"; // yyyy-MM-dd
+  var IS_TODAY = <%= isToday %>;
   var data      = {};
   var dayOffset = 0;
   var today     = new Date();
   var chartInst = null;
 
-  /* ---------- DATE ---------- */
+  /* todayExercises is really "exercises for SELECTED_DATE" — server already
+     filtered by date, so map it under that key rather than always "today". */
+  data[SELECTED_DATE] = todayExercises;
+
+  /* ---------- EXERCISE NAME AUTOCOMPLETE ---------- */
+var commonExercises = [
+
+  // ═══════════════════════════════════════════════════════════
+  // CHEST
+  // ═══════════════════════════════════════════════════════════
+  "Barbell Bench Press",
+  "Incline Barbell Bench Press",
+  "Decline Barbell Bench Press",
+  "Dumbbell Bench Press",
+  "Incline Dumbbell Bench Press",
+  "Decline Dumbbell Bench Press",
+  "Close-Grip Bench Press",
+  "Wide-Grip Bench Press",
+  "Dumbbell Flyes",
+  "Incline Dumbbell Flyes",
+  "Decline Dumbbell Flyes",
+  "Cable Chest Flyes",
+  "Low Cable Flyes",
+  "High Cable Flyes",
+  "Cable Crossover",
+  "Pec Deck Machine",
+  "Machine Chest Press",
+  "Smith Machine Bench Press",
+  "Smith Machine Incline Press",
+  "Chest Dips",
+  "Push-Up",
+  "Wide-Grip Push-Up",
+  "Diamond Push-Up",
+  "Archer Push-Up",
+  "Decline Push-Up",
+  "Incline Push-Up",
+  "Plyometric Push-Up",
+  "Landmine Press",
+  "Svend Press",
+  "Squeeze Press",
+
+  // ═══════════════════════════════════════════════════════════
+  // BACK
+  // ═══════════════════════════════════════════════════════════
+  "Conventional Deadlift",
+  "Sumo Deadlift",
+  "Romanian Deadlift",
+  "Stiff-Leg Deadlift",
+  "Deficit Deadlift",
+  "Rack Pull",
+  "Trap Bar Deadlift",
+  "Barbell Row",
+  "Pendlay Row",
+  "Yates Row",
+  "T-Bar Row",
+  "Dumbbell Row",
+  "Single-Arm Dumbbell Row",
+  "Chest-Supported Row",
+  "Seal Row",
+  "Seated Cable Row",
+  "Wide-Grip Seated Cable Row",
+  "Single-Arm Cable Row",
+  "Low Row",
+  "Pull-Up",
+  "Wide-Grip Pull-Up",
+  "Neutral-Grip Pull-Up",
+  "Chin-Up",
+  "Archer Pull-Up",
+  "Weighted Pull-Up",
+  "Assisted Pull-Up",
+  "Lat Pulldown",
+  "Wide-Grip Lat Pulldown",
+  "Close-Grip Lat Pulldown",
+  "Reverse-Grip Lat Pulldown",
+  "Single-Arm Lat Pulldown",
+  "Straight-Arm Pulldown",
+  "Kneeling Lat Pulldown",
+  "Dumbbell Pullover",
+  "Cable Pullover",
+  "Back Extension",
+  "Hyperextension",
+  "Good Morning",
+  "Meadows Row",
+  "Inverted Row",
+  "TRX Row",
+
+  // ═══════════════════════════════════════════════════════════
+  // SHOULDERS
+  // ═══════════════════════════════════════════════════════════
+  "Barbell Overhead Press",
+  "Seated Barbell Overhead Press",
+  "Dumbbell Shoulder Press",
+  "Seated Dumbbell Shoulder Press",
+  "Arnold Press",
+  "Push Press",
+  "Behind-the-Neck Press",
+  "Smith Machine Shoulder Press",
+  "Machine Shoulder Press",
+  "Cable Shoulder Press",
+  "Lateral Raise",
+  "Dumbbell Lateral Raise",
+  "Cable Lateral Raise",
+  "Machine Lateral Raise",
+  "Leaning Cable Lateral Raise",
+  "Front Raise",
+  "Dumbbell Front Raise",
+  "Barbell Front Raise",
+  "Cable Front Raise",
+  "Plate Front Raise",
+  "Reverse Pec Deck",
+  "Bent-Over Lateral Raise",
+  "Face Pull",
+  "Cable Face Pull",
+  "Band Face Pull",
+  "Upright Row",
+  "Barbell Shrugs",
+  "Dumbbell Shrugs",
+  "Cable Shrugs",
+  "Machine Shrugs",
+  "Band Pull-Apart",
+  "Cuban Press",
+  "Y-T-W Raise",
+
+  // ═══════════════════════════════════════════════════════════
+  // BICEPS
+  // ═══════════════════════════════════════════════════════════
+  "Barbell Bicep Curl",
+  "Dumbbell Bicep Curl",
+  "Alternating Dumbbell Curl",
+  "Hammer Curl",
+  "Alternating Hammer Curl",
+  "Cross-Body Hammer Curl",
+  "EZ-Bar Curl",
+  "EZ-Bar Preacher Curl",
+  "Barbell Preacher Curl",
+  "Dumbbell Preacher Curl",
+  "Machine Preacher Curl",
+  "Concentration Curl",
+  "Spider Curl",
+  "Incline Dumbbell Curl",
+  "Cable Bicep Curl",
+  "Low Cable Curl",
+  "High Cable Curl",
+  "Rope Hammer Curl",
+  "Reverse Barbell Curl",
+  "Reverse EZ-Bar Curl",
+  "Zottman Curl",
+  "21s",
+  "Machine Bicep Curl",
+  "TRX Bicep Curl",
+  "Drag Curl",
+  "Cable Concentration Curl",
+
+  // ═══════════════════════════════════════════════════════════
+  // TRICEPS
+  // ═══════════════════════════════════════════════════════════
+  "Tricep Dips",
+  "Bench Dips",
+  "Close-Grip Bench Press",
+  "Skull Crusher",
+  "EZ-Bar Skull Crusher",
+  "Dumbbell Skull Crusher",
+  "Cable Skull Crusher",
+  "Overhead Tricep Extension",
+  "Dumbbell Overhead Tricep Extension",
+  "EZ-Bar Overhead Tricep Extension",
+  "Cable Overhead Tricep Extension",
+  "Rope Overhead Extension",
+  "Cable Tricep Pushdown",
+  "Rope Pushdown",
+  "Straight Bar Pushdown",
+  "Reverse Grip Pushdown",
+  "Single-Arm Cable Pushdown",
+  "Tricep Kickback",
+  "Dumbbell Tricep Kickback",
+  "Cable Tricep Kickback",
+  "Machine Tricep Press",
+  "Tate Press",
+  "JM Press",
+  "Diamond Push-Up",
+
+  // ═══════════════════════════════════════════════════════════
+  // FOREARMS & GRIP
+  // ═══════════════════════════════════════════════════════════
+  "Wrist Curl",
+  "Reverse Wrist Curl",
+  "Barbell Wrist Curl",
+  "Dumbbell Wrist Curl",
+  "Behind-the-Back Wrist Curl",
+  "Reverse Curl",
+  "Farmer's Carry",
+  "Plate Pinch",
+  "Dead Hang",
+  "Towel Pull-Up",
+
+  // ═══════════════════════════════════════════════════════════
+  // QUADS
+  // ═══════════════════════════════════════════════════════════
+  "Barbell Back Squat",
+  "Barbell Front Squat",
+  "Low-Bar Squat",
+  "High-Bar Squat",
+  "Goblet Squat",
+  "Hack Squat",
+  "Smith Machine Squat",
+  "Leg Press",
+  "Narrow Stance Leg Press",
+  "Wide Stance Leg Press",
+  "Leg Extension",
+  "Bulgarian Split Squat",
+  "Dumbbell Bulgarian Split Squat",
+  "Lunges",
+  "Barbell Lunges",
+  "Dumbbell Lunges",
+  "Walking Lunges",
+  "Reverse Lunge",
+  "Lateral Lunge",
+  "Step-Up",
+  "Dumbbell Step-Up",
+  "Barbell Step-Up",
+  "Box Jump",
+  "Jump Squat",
+  "Sissy Squat",
+  "Wall Sit",
+  "Sumo Squat",
+  "Dumbbell Sumo Squat",
+  "Landmine Squat",
+  "Zercher Squat",
+  "Safety Bar Squat",
+  "Pistol Squat",
+  "Assisted Pistol Squat",
+
+  // ═══════════════════════════════════════════════════════════
+  // HAMSTRINGS
+  // ═══════════════════════════════════════════════════════════
+  "Lying Leg Curl",
+  "Seated Leg Curl",
+  "Standing Leg Curl",
+  "Nordic Hamstring Curl",
+  "Glute-Ham Raise",
+  "Good Morning",
+  "Dumbbell Romanian Deadlift",
+  "Single-Leg Romanian Deadlift",
+  "Cable Romanian Deadlift",
+  "Snatch-Grip Deadlift",
+  "Leg Press (Hamstring Focus)",
+
+  // ═══════════════════════════════════════════════════════════
+  // GLUTES
+  // ═══════════════════════════════════════════════════════════
+  "Barbell Hip Thrust",
+  "Dumbbell Hip Thrust",
+  "Machine Hip Thrust",
+  "Glute Bridge",
+  "Single-Leg Glute Bridge",
+  "Barbell Glute Bridge",
+  "Cable Pull-Through",
+  "Kettlebell Swing",
+  "Donkey Kick",
+  "Cable Donkey Kick",
+  "Reverse Hyperextension",
+  "Abduction Machine",
+  "Cable Hip Abduction",
+  "Banded Glute Kickback",
+  "Lateral Band Walk",
+  "Clamshell",
+  "Frog Pump",
+  "Sumo Deadlift (Glute Focus)",
+
+  // ═══════════════════════════════════════════════════════════
+  // CALVES
+  // ═══════════════════════════════════════════════════════════
+  "Standing Calf Raise",
+  "Seated Calf Raise",
+  "Leg Press Calf Raise",
+  "Single-Leg Standing Calf Raise",
+  "Donkey Calf Raise",
+  "Smith Machine Calf Raise",
+  "Barbell Calf Raise",
+  "Dumbbell Calf Raise",
+  "Tibialis Raise",
+  "Jump Rope Calf Bounces",
+
+  // ═══════════════════════════════════════════════════════════
+  // ABS & CORE
+  // ═══════════════════════════════════════════════════════════
+  "Plank",
+  "Side Plank",
+  "Long-Lever Plank",
+  "Plank with Hip Dip",
+  "Ab Wheel Rollout",
+  "Barbell Rollout",
+  "Cable Crunch",
+  "Rope Cable Crunch",
+  "Decline Cable Crunch",
+  "Crunch",
+  "Decline Crunch",
+  "Bicycle Crunch",
+  "Reverse Crunch",
+  "Sit-Up",
+  "Decline Sit-Up",
+  "V-Up",
+  "Hanging Leg Raise",
+  "Hanging Knee Raise",
+  "Toes to Bar",
+  "Windshield Wiper",
+  "Russian Twist",
+  "Weighted Russian Twist",
+  "Pallof Press",
+  "Cable Pallof Press",
+  "Woodchop",
+  "Cable Woodchop",
+  "Landmine Twist",
+  "Dragon Flag",
+  "L-Sit",
+  "Hollow Body Hold",
+  "Dead Bug",
+  "Mountain Climber",
+  "Flutter Kick",
+  "Scissor Kick",
+  "Leg Raise",
+  "Lying Leg Raise",
+
+  // ═══════════════════════════════════════════════════════════
+  // OLYMPIC / POWER LIFTS
+  // ═══════════════════════════════════════════════════════════
+  "Power Clean",
+  "Hang Clean",
+  "Full Clean",
+  "Power Snatch",
+  "Hang Snatch",
+  "Clean and Jerk",
+  "Clean and Press",
+  "Push Jerk",
+  "Split Jerk",
+  "Muscle Snatch",
+
+  // ═══════════════════════════════════════════════════════════
+  // FULL BODY / FUNCTIONAL
+  // ═══════════════════════════════════════════════════════════
+  "Thruster",
+  "Barbell Thruster",
+  "Dumbbell Thruster",
+  "Kettlebell Thruster",
+  "Burpee",
+  "Burpee Pull-Up",
+  "Box Burpee",
+  "Dumbbell Snatch",
+  "Kettlebell Snatch",
+  "Kettlebell Clean",
+  "Kettlebell Clean and Press",
+  "Kettlebell Turkish Get-Up",
+  "Kettlebell Goblet Squat",
+  "Barbell Complex",
+  "Dumbbell Complex",
+  "Devil's Press",
+  "Man Maker",
+  "Bear Complex",
+
+  // ═══════════════════════════════════════════════════════════
+  // CARRIES & LOADED CONDITIONING
+  // ═══════════════════════════════════════════════════════════
+  "Farmer's Walk",
+  "Dumbbell Farmer's Walk",
+  "Kettlebell Farmer's Walk",
+  "Trap Bar Farmer's Walk",
+  "Suitcase Carry",
+  "Overhead Carry",
+  "Waiter's Walk",
+  "Zercher Carry",
+  "Sandbag Carry",
+  "Yoke Walk",
+  "Sled Push",
+  "Sled Pull",
+  "Sled Row",
+  "Battle Ropes",
+  "Battle Rope Waves",
+  "Battle Rope Slams",
+  "Tire Flip",
+  "Medicine Ball Slam",
+  "Medicine Ball Chest Pass",
+  "Medicine Ball Overhead Slam",
+  "Sandbag Squat",
+  "Sandbag Clean",
+
+  // ═══════════════════════════════════════════════════════════
+  // CARDIO / CONDITIONING
+  // ═══════════════════════════════════════════════════════════
+  "Treadmill Run",
+  "Treadmill Incline Walk",
+  "Stationary Bike",
+  "Assault Bike",
+  "Rowing Machine",
+  "SkiErg",
+  "Stair Climber",
+  "Elliptical",
+  "Jump Rope",
+  "Double-Unders",
+  "Box Jump",
+  "Broad Jump",
+  "Sprint Intervals",
+  "Shuttle Run",
+  "Swimming Laps",
+  "Cycling",
+  "Step Mill"
+
+];
+
+// ═══════════════════════════════════════════════════════════
+// MUSCLE GROUP MAP
+// ═══════════════════════════════════════════════════════════
+var exerciseMuscleMap = {
+  // Chest
+  "Barbell Bench Press":"Chest","Incline Barbell Bench Press":"Chest","Decline Barbell Bench Press":"Chest",
+  "Dumbbell Bench Press":"Chest","Incline Dumbbell Bench Press":"Chest","Decline Dumbbell Bench Press":"Chest",
+  "Close-Grip Bench Press":"Chest / Triceps","Wide-Grip Bench Press":"Chest",
+  "Dumbbell Flyes":"Chest","Incline Dumbbell Flyes":"Chest","Decline Dumbbell Flyes":"Chest",
+  "Cable Chest Flyes":"Chest","Low Cable Flyes":"Chest","High Cable Flyes":"Chest",
+  "Cable Crossover":"Chest","Pec Deck Machine":"Chest","Machine Chest Press":"Chest",
+  "Smith Machine Bench Press":"Chest","Smith Machine Incline Press":"Chest",
+  "Chest Dips":"Chest","Push-Up":"Chest","Wide-Grip Push-Up":"Chest",
+  "Diamond Push-Up":"Triceps","Archer Push-Up":"Chest","Decline Push-Up":"Chest",
+  "Incline Push-Up":"Chest","Plyometric Push-Up":"Chest","Landmine Press":"Chest",
+  "Svend Press":"Chest","Squeeze Press":"Chest",
+  // Back
+  "Conventional Deadlift":"Back","Sumo Deadlift":"Back","Romanian Deadlift":"Hamstrings",
+  "Stiff-Leg Deadlift":"Hamstrings","Deficit Deadlift":"Back","Rack Pull":"Back",
+  "Trap Bar Deadlift":"Back","Barbell Row":"Back","Pendlay Row":"Back","Yates Row":"Back",
+  "T-Bar Row":"Back","Dumbbell Row":"Back","Single-Arm Dumbbell Row":"Back",
+  "Chest-Supported Row":"Back","Seal Row":"Back","Seated Cable Row":"Back",
+  "Wide-Grip Seated Cable Row":"Back","Single-Arm Cable Row":"Back","Low Row":"Back",
+  "Pull-Up":"Back","Wide-Grip Pull-Up":"Back","Neutral-Grip Pull-Up":"Back",
+  "Chin-Up":"Back / Biceps","Archer Pull-Up":"Back","Weighted Pull-Up":"Back","Assisted Pull-Up":"Back",
+  "Lat Pulldown":"Back","Wide-Grip Lat Pulldown":"Back","Close-Grip Lat Pulldown":"Back",
+  "Reverse-Grip Lat Pulldown":"Back","Single-Arm Lat Pulldown":"Back",
+  "Straight-Arm Pulldown":"Back","Kneeling Lat Pulldown":"Back",
+  "Dumbbell Pullover":"Back / Chest","Cable Pullover":"Back","Back Extension":"Lower Back",
+  "Hyperextension":"Lower Back","Good Morning":"Hamstrings",
+  "Meadows Row":"Back","Inverted Row":"Back","TRX Row":"Back",
+  // Shoulders
+  "Barbell Overhead Press":"Shoulders","Seated Barbell Overhead Press":"Shoulders",
+  "Dumbbell Shoulder Press":"Shoulders","Seated Dumbbell Shoulder Press":"Shoulders",
+  "Arnold Press":"Shoulders","Push Press":"Shoulders","Behind-the-Neck Press":"Shoulders",
+  "Smith Machine Shoulder Press":"Shoulders","Machine Shoulder Press":"Shoulders","Cable Shoulder Press":"Shoulders",
+  "Lateral Raise":"Shoulders","Dumbbell Lateral Raise":"Shoulders","Cable Lateral Raise":"Shoulders",
+  "Machine Lateral Raise":"Shoulders","Leaning Cable Lateral Raise":"Shoulders",
+  "Front Raise":"Shoulders","Dumbbell Front Raise":"Shoulders","Barbell Front Raise":"Shoulders",
+  "Cable Front Raise":"Shoulders","Plate Front Raise":"Shoulders",
+  "Reverse Pec Deck":"Rear Delts","Bent-Over Lateral Raise":"Rear Delts",
+  "Face Pull":"Rear Delts","Cable Face Pull":"Rear Delts","Band Face Pull":"Rear Delts",
+  "Upright Row":"Shoulders / Traps","Barbell Shrugs":"Traps","Dumbbell Shrugs":"Traps",
+  "Cable Shrugs":"Traps","Machine Shrugs":"Traps","Band Pull-Apart":"Rear Delts",
+  "Cuban Press":"Shoulders","Y-T-W Raise":"Rear Delts",
+  // Biceps
+  "Barbell Bicep Curl":"Biceps","Dumbbell Bicep Curl":"Biceps","Alternating Dumbbell Curl":"Biceps",
+  "Hammer Curl":"Biceps","Alternating Hammer Curl":"Biceps","Cross-Body Hammer Curl":"Biceps",
+  "EZ-Bar Curl":"Biceps","EZ-Bar Preacher Curl":"Biceps","Barbell Preacher Curl":"Biceps",
+  "Dumbbell Preacher Curl":"Biceps","Machine Preacher Curl":"Biceps","Concentration Curl":"Biceps",
+  "Spider Curl":"Biceps","Incline Dumbbell Curl":"Biceps","Cable Bicep Curl":"Biceps",
+  "Low Cable Curl":"Biceps","High Cable Curl":"Biceps","Rope Hammer Curl":"Biceps",
+  "Reverse Barbell Curl":"Forearms","Reverse EZ-Bar Curl":"Forearms","Zottman Curl":"Forearms",
+  "21s":"Biceps","Machine Bicep Curl":"Biceps","TRX Bicep Curl":"Biceps",
+  "Drag Curl":"Biceps","Cable Concentration Curl":"Biceps",
+  // Triceps
+  "Tricep Dips":"Triceps","Bench Dips":"Triceps","Skull Crusher":"Triceps",
+  "EZ-Bar Skull Crusher":"Triceps","Dumbbell Skull Crusher":"Triceps","Cable Skull Crusher":"Triceps",
+  "Overhead Tricep Extension":"Triceps","Dumbbell Overhead Tricep Extension":"Triceps",
+  "EZ-Bar Overhead Tricep Extension":"Triceps","Cable Overhead Tricep Extension":"Triceps",
+  "Rope Overhead Extension":"Triceps","Cable Tricep Pushdown":"Triceps","Rope Pushdown":"Triceps",
+  "Straight Bar Pushdown":"Triceps","Reverse Grip Pushdown":"Triceps","Single-Arm Cable Pushdown":"Triceps",
+  "Tricep Kickback":"Triceps","Dumbbell Tricep Kickback":"Triceps","Cable Tricep Kickback":"Triceps",
+  "Machine Tricep Press":"Triceps","Tate Press":"Triceps","JM Press":"Triceps",
+  // Forearms
+  "Wrist Curl":"Forearms","Reverse Wrist Curl":"Forearms","Barbell Wrist Curl":"Forearms",
+  "Dumbbell Wrist Curl":"Forearms","Behind-the-Back Wrist Curl":"Forearms",
+  "Reverse Curl":"Forearms","Farmer's Carry":"Forearms / Grip","Plate Pinch":"Forearms",
+  "Dead Hang":"Forearms / Grip","Towel Pull-Up":"Forearms",
+  // Quads
+  "Barbell Back Squat":"Quads","Barbell Front Squat":"Quads","Low-Bar Squat":"Quads",
+  "High-Bar Squat":"Quads","Goblet Squat":"Quads","Hack Squat":"Quads",
+  "Smith Machine Squat":"Quads","Leg Press":"Quads","Narrow Stance Leg Press":"Quads",
+  "Wide Stance Leg Press":"Quads","Leg Extension":"Quads","Bulgarian Split Squat":"Quads",
+  "Dumbbell Bulgarian Split Squat":"Quads","Lunges":"Quads","Barbell Lunges":"Quads",
+  "Dumbbell Lunges":"Quads","Walking Lunges":"Quads","Reverse Lunge":"Quads",
+  "Lateral Lunge":"Quads","Step-Up":"Quads","Dumbbell Step-Up":"Quads","Barbell Step-Up":"Quads",
+  "Box Jump":"Quads","Jump Squat":"Quads","Sissy Squat":"Quads","Wall Sit":"Quads",
+  "Sumo Squat":"Quads / Glutes","Dumbbell Sumo Squat":"Quads / Glutes",
+  "Landmine Squat":"Quads","Zercher Squat":"Quads","Safety Bar Squat":"Quads",
+  "Pistol Squat":"Quads","Assisted Pistol Squat":"Quads",
+  // Hamstrings
+  "Lying Leg Curl":"Hamstrings","Seated Leg Curl":"Hamstrings","Standing Leg Curl":"Hamstrings",
+  "Nordic Hamstring Curl":"Hamstrings","Glute-Ham Raise":"Hamstrings / Glutes",
+  "Dumbbell Romanian Deadlift":"Hamstrings","Single-Leg Romanian Deadlift":"Hamstrings",
+  "Cable Romanian Deadlift":"Hamstrings","Snatch-Grip Deadlift":"Hamstrings / Back",
+  "Leg Press (Hamstring Focus)":"Hamstrings","Stiff-Leg Deadlift":"Hamstrings",
+  // Glutes
+  "Barbell Hip Thrust":"Glutes","Dumbbell Hip Thrust":"Glutes","Machine Hip Thrust":"Glutes",
+  "Glute Bridge":"Glutes","Single-Leg Glute Bridge":"Glutes","Barbell Glute Bridge":"Glutes",
+  "Cable Pull-Through":"Glutes","Kettlebell Swing":"Glutes","Donkey Kick":"Glutes",
+  "Cable Donkey Kick":"Glutes","Reverse Hyperextension":"Glutes","Abduction Machine":"Glutes",
+  "Cable Hip Abduction":"Glutes","Banded Glute Kickback":"Glutes","Lateral Band Walk":"Glutes",
+  "Clamshell":"Glutes","Frog Pump":"Glutes","Sumo Deadlift (Glute Focus)":"Glutes",
+  // Calves
+  "Standing Calf Raise":"Calves","Seated Calf Raise":"Calves","Leg Press Calf Raise":"Calves",
+  "Single-Leg Standing Calf Raise":"Calves","Donkey Calf Raise":"Calves",
+  "Smith Machine Calf Raise":"Calves","Barbell Calf Raise":"Calves",
+  "Dumbbell Calf Raise":"Calves","Tibialis Raise":"Calves","Jump Rope Calf Bounces":"Calves",
+  // Core
+  "Plank":"Core","Side Plank":"Core","Long-Lever Plank":"Core","Plank with Hip Dip":"Core",
+  "Ab Wheel Rollout":"Core","Barbell Rollout":"Core","Cable Crunch":"Abs",
+  "Rope Cable Crunch":"Abs","Decline Cable Crunch":"Abs","Crunch":"Abs","Decline Crunch":"Abs",
+  "Bicycle Crunch":"Abs","Reverse Crunch":"Abs","Sit-Up":"Abs","Decline Sit-Up":"Abs",
+  "V-Up":"Abs","Hanging Leg Raise":"Abs","Hanging Knee Raise":"Abs","Toes to Bar":"Abs",
+  "Windshield Wiper":"Abs","Russian Twist":"Abs","Weighted Russian Twist":"Abs",
+  "Pallof Press":"Core","Cable Pallof Press":"Core","Woodchop":"Core","Cable Woodchop":"Core",
+  "Landmine Twist":"Core","Dragon Flag":"Abs","L-Sit":"Core","Hollow Body Hold":"Core",
+  "Dead Bug":"Core","Mountain Climber":"Core","Flutter Kick":"Abs",
+  "Scissor Kick":"Abs","Leg Raise":"Abs","Lying Leg Raise":"Abs",
+  // Olympic
+  "Power Clean":"Full Body","Hang Clean":"Full Body","Full Clean":"Full Body",
+  "Power Snatch":"Full Body","Hang Snatch":"Full Body","Clean and Jerk":"Full Body",
+  "Clean and Press":"Full Body","Push Jerk":"Full Body","Split Jerk":"Full Body","Muscle Snatch":"Full Body",
+  // Full Body
+  "Thruster":"Full Body","Barbell Thruster":"Full Body","Dumbbell Thruster":"Full Body",
+  "Kettlebell Thruster":"Full Body","Burpee":"Full Body","Burpee Pull-Up":"Full Body",
+  "Box Burpee":"Full Body","Dumbbell Snatch":"Full Body","Kettlebell Snatch":"Full Body",
+  "Kettlebell Clean":"Full Body","Kettlebell Clean and Press":"Full Body",
+  "Kettlebell Turkish Get-Up":"Full Body","Kettlebell Goblet Squat":"Quads",
+  "Barbell Complex":"Full Body","Dumbbell Complex":"Full Body","Devil's Press":"Full Body",
+  "Man Maker":"Full Body","Bear Complex":"Full Body",
+  // Carries
+  "Farmer's Walk":"Forearms / Core","Dumbbell Farmer's Walk":"Forearms / Core",
+  "Kettlebell Farmer's Walk":"Forearms / Core","Trap Bar Farmer's Walk":"Forearms / Core",
+  "Suitcase Carry":"Core","Overhead Carry":"Shoulders","Waiter's Walk":"Shoulders",
+  "Zercher Carry":"Core","Sandbag Carry":"Full Body","Yoke Walk":"Full Body",
+  "Sled Push":"Full Body","Sled Pull":"Full Body","Sled Row":"Back",
+  "Battle Ropes":"Full Body","Battle Rope Waves":"Full Body","Battle Rope Slams":"Full Body",
+  "Tire Flip":"Full Body","Medicine Ball Slam":"Full Body","Medicine Ball Chest Pass":"Chest",
+  "Medicine Ball Overhead Slam":"Full Body","Sandbag Squat":"Quads","Sandbag Clean":"Full Body",
+  // Cardio
+  "Treadmill Run":"Cardio","Treadmill Incline Walk":"Cardio","Stationary Bike":"Cardio",
+  "Assault Bike":"Cardio","Rowing Machine":"Cardio","SkiErg":"Cardio","Stair Climber":"Cardio",
+  "Elliptical":"Cardio","Jump Rope":"Cardio","Double-Unders":"Cardio",
+  "Broad Jump":"Legs","Sprint Intervals":"Cardio","Shuttle Run":"Cardio",
+  "Swimming Laps":"Cardio","Cycling":"Cardio","Step Mill":"Cardio"
+};
+
+// ═══════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════
+
+function getExerciseMuscle(name) {
+  return exerciseMuscleMap[(name||'').trim()] || '';
+}
+
+function searchExercises(query) {
+  if (!query || query.length < 1) return [];
+  var q = query.trim().toLowerCase();
+  // Prioritise starts-with matches, then contains
+  var starts = [], contains = [];
+  commonExercises.forEach(function(e) {
+    var el = e.toLowerCase();
+    if (el.startsWith(q))      starts.push(e);
+    else if (el.includes(q))   contains.push(e);
+  });
+  return starts.concat(contains).slice(0, 10);
+}
+// ── HELPER: get muscle group for any exercise name ──────────
+function getExerciseMuscle(name) {
+  if (!name) return '';
+  var key = name.trim();
+  return exerciseMuscleMap[key] || '';
+}
+
+// ── HELPER: fuzzy search / autocomplete ────────────────────
+function searchExercises(query) {
+  if (!query || query.length < 1) return [];
+  var q = query.trim().toLowerCase();
+  return commonExercises.filter(function(e) {
+    return e.toLowerCase().includes(q);
+  }).slice(0, 8); // return top 8 matches
+}
+
+  function refreshExerciseSuggestions() {
+    var namesSet = {};
+    commonExercises.forEach(function(n) { namesSet[n] = true; });
+    Object.keys(data).forEach(function(k) {
+      (data[k] || []).forEach(function(e) {
+        // Title-case whatever the user previously typed, so it shows up nicely too
+        var n = e.name.trim();
+        if (n) namesSet[n] = true;
+      });
+    });
+    var list = Object.keys(namesSet).sort();
+    var dl = document.getElementById('exerciseSuggestions');
+    dl.innerHTML = list.map(function(n) {
+      return '<option value="' + n.replace(/"/g, '&quot;') + '">';
+    }).join('');
+  }
+  refreshExerciseSuggestions();
+
+  /* ---------- NAV (matches calorie.jsp) ---------- */
+  function toggleNav() {
+    var open = document.getElementById('navDropdown').classList.toggle('open');
+    document.getElementById('hamBtn').classList.toggle('open', open);
+    document.getElementById('navOverlay').classList.toggle('open', open);
+  }
+  function closeNav() {
+    document.getElementById('navDropdown').classList.remove('open');
+    document.getElementById('hamBtn').classList.remove('open');
+    document.getElementById('navOverlay').classList.remove('open');
+  }
+
+  /* ---------- LOGOUT ----------
+     Must POST (the servlet only handles action=logout in doPost, not doGet) */
+  function logout() {
+    closeNav();
+    if (!confirm('Log out of GoFit?')) return;
+    var f = document.createElement('form');
+    f.method = 'POST'; f.action = 'GoFit';
+    var i = document.createElement('input');
+    i.type = 'hidden'; i.name = 'action'; i.value = 'logout';
+    f.appendChild(i);
+    document.body.appendChild(f);
+    f.submit();
+  }
+
+  /* ---------- DATE ----------
+     Parse/format SELECTED_DATE (yyyy-MM-dd) as a LOCAL date, not UTC, to avoid
+     off-by-one near midnight in some timezones. */
+  function parseLocalDate(str) {
+    var parts = str.split('-');
+    return new Date(parseInt(parts[0],10), parseInt(parts[1],10)-1, parseInt(parts[2],10));
+  }
+  function formatLocalDate(d) {
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
   function getDate(offset) {
-    var d = new Date();
+    var d = parseLocalDate(SELECTED_DATE);
     d.setDate(d.getDate() + offset);
     return d;
   }
   function getKey(d) {
-    return d.toISOString().split("T")[0];
+    return formatLocalDate(d);
   }
   function updateDate() {
-    var d     = getDate(dayOffset);
-    var label = dayOffset === 0  ? "Today"
-              : dayOffset === -1 ? "Yesterday"
-              : d.toDateString();
+    var d = parseLocalDate(SELECTED_DATE);
+    var yestDate = new Date(); yestDate.setDate(yestDate.getDate()-1);
+    var yestStr  = formatLocalDate(yestDate);
+    var label = IS_TODAY ? "Today" : (SELECTED_DATE === yestStr ? "Yesterday" : d.toDateString());
     document.getElementById("dateLabel").innerText = label;
-    document.getElementById("btnNext").disabled    = (dayOffset === 0);
+    document.getElementById("btnNext").disabled    = IS_TODAY;
   }
 
-  /* ---------- NAV ---------- */
+  /* ---------- NAV ----------
+     Navigating a day now reloads the page from the server with ?date=..., so
+     past days show real logged data instead of an always-empty client stand-in. */
   function changeDay(dir) {
-    if (dayOffset + dir > 0) return;
-    dayOffset += dir;
-    updateDate();
-    render();
+    var d = getDate(dir);
+    var newDateStr = formatLocalDate(d);
+    var todayStr   = formatLocalDate(new Date());
+    if (newDateStr > todayStr) return; // block future dates
+    window.location.href = 'GoFit?page=workout&date=' + newDateStr;
   }
 
   /* ---------- e1RM (Epley formula) ---------- */
@@ -705,29 +1362,22 @@
     return Math.max.apply(null, h.map(function(x) { return x.rm; }));
   }
 
-  /* ---------- ADD ---------- */
-  function addExercise() {
-    var name = document.getElementById("name").value.trim();
-    if (!name) { document.getElementById("name").focus(); return; }
-
-    var reps   = document.getElementById("reps").value;
-    var weight = document.getElementById("weight").value;
-
-    var key = getKey(getDate(dayOffset));
-    if (!data[key]) { data[key] = []; }
-    data[key].push({ name: name, reps: reps, weight: weight });
-
-    document.getElementById("name").value = "";
-    render();
-  }
+  /* ---------- ADD ----------
+     Exercise entry is now a real <form> (see Log Exercise card) that POSTs straight
+     to GoFit?action=addExercise and reloads with fresh DB data. */
 
   /* ---------- DELETE ---------- */
-  function deleteExercise(index, event) {
+  function deleteExercise(id, event) {
     event.stopPropagation();
-    var key = getKey(getDate(dayOffset));
-    if (!data[key]) return;
-    data[key].splice(index, 1);
-    render();
+    if (!id) return; // not-yet-saved items can't be deleted server-side
+    fetch('GoFit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'action=deleteExercise&id=' + encodeURIComponent(id)
+    }).then(function(res){
+      if (!res.ok) throw new Error('Server returned ' + res.status);
+      location.reload();
+    }).catch(function(err){ alert('Could not delete: ' + err.message); });
   }
 
   /* ---------- RENDER ---------- */
@@ -759,7 +1409,7 @@
         html += "    </div>";
         html += "    <div class='ex-detail'>" + e.reps + " reps @ " + w + "kg</div>";
         html += "  </div>";
-        html += "  <button class='btn-delete' onclick='deleteExercise(" + i + ", event)'>&#10005;</button>";
+        if (e.id) html += "  <button class='btn-delete' onclick='deleteExercise(" + e.id + ", event)'>&#10005;</button>";
         html += "</div>";
       }
     }

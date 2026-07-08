@@ -115,7 +115,8 @@
 </style>
 </head>
 <body>
-<form action = "logout" method = "post">
+<form action="GoFit" method="post">
+<input type="hidden" name="action" value="logout">
 
 <div class="card">
   <div class="logo">
@@ -145,10 +146,11 @@
     </div>
   </div>
 
-  <button class="btn-logout">Log out</button>
+  <button type="submit" class="btn-logout">Log out</button>
   <div class="divider">or</div>
-  <button class="btn-stay">Stay on GoFit</button>
+  <button type="button" class="btn-stay" onclick="window.location.href='userdashboard.jsp'">Stay on GoFit</button>
 </div>
+</form>
 
 <div class="grid-decoration">
   <div class="grid-box lvl-1"></div><div class="grid-box"></div><div class="grid-box lvl-2"></div><div class="grid-box"></div><div class="grid-box lvl-1"></div>
@@ -156,8 +158,7 @@
   <div class="grid-box lvl-2"></div><div class="grid-box"></div><div class="grid-box lvl-1"></div><div class="grid-box"></div><div class="grid-box lvl-3"></div>
   <div class="grid-box"></div><div class="grid-box lvl-1"></div><div class="grid-box lvl-2"></div><div class="grid-box"></div><div class="grid-box"></div>
   <div class="grid-box lvl-1"></div><div class="grid-box lvl-3"></div><div class="grid-box lvl-4"></div><div class="grid-box lvl-2"></div><div class="grid-box"></div>
-</form></div>
-
+</div>
 
 </body>
 </html>

@@ -255,7 +255,7 @@
   <p class="hero-sub">No noise. No overwhelm. Just calories, weight, steps and strength — everything you need to stay consistent.</p>
 
   <div class="hero-actions">
-    <a href="login.jsp?tab=📊" class="btn-primary">Login</a>
+    <a href="login.jsp" class="btn-primary">Login</a>
     <a href="register.jsp" class="btn-ghost">Register</a>
   </div>
 
