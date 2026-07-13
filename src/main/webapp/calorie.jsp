@@ -8,8 +8,7 @@
     }
     int calorieGoal = (currentUser.getCalorieGoal() > 0) ? currentUser.getCalorieGoal() : 2200;
     List<CalorieLog> calorieLogs = (List<CalorieLog>) request.getAttribute("calorieLogs");
-    // ── Date-nav support: which day's logs are we actually showing? Set by the
-    // servlet based on ?date=yyyy-MM-dd; defaults to today if not supplied. ──
+
     String selectedDateStr = (String) request.getAttribute("selectedDate");
     if (selectedDateStr == null) selectedDateStr = java.time.LocalDate.now().toString();
     Boolean isTodayAttr = (Boolean) request.getAttribute("isToday");
@@ -592,13 +591,12 @@
     document.getElementById('addCard').style.display = IS_TODAY ? 'block' : 'none';
     document.getElementById('aiInsightCard').style.display = IS_TODAY ? 'block' : 'none';
   }
-  // Navigating a day now reloads the page from the server with ?date=..., so past
-  // days show real logged data instead of an always-empty client-side stand-in.
+  
   function changeDay(dir){
     var d = getDate(dir);
     var newDateStr = formatLocalDate(d);
     var todayStr = formatLocalDate(new Date());
-    if (newDateStr > todayStr) return; // block future dates
+    if (newDateStr > todayStr) return; 
     window.location.href = 'GoFit?page=calorie&date=' + newDateStr;
   }
   function getItems(){ return data[SELECTED_DATE] || []; }
@@ -613,7 +611,7 @@
       .catch(function(err){ showToast('Could not delete: ' + err.message); });
   }
 
-  // ── Indian food autocomplete + quantity scaling ──
+
   (function initFoodAutocomplete(){
     var dl = document.getElementById('foodDatalist');
     dl.innerHTML = Object.keys(INDIAN_FOODS).map(function(k){

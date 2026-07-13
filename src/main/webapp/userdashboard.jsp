@@ -1057,15 +1057,19 @@
   }
 
   function saveGoal() {
-    currentGoal = pendingGoal;
-    var d = goalData[currentGoal];
-    document.getElementById('goal-display').textContent = d.label;
-    document.getElementById('goal-desc').textContent = d.desc;
-    document.getElementById('goal-hint').textContent = d.hint;
-    closeModal('goal');
-    /* Note: no servlet action exists yet to persist goal changes —
-       this updates the on-screen value only until a real
-       "updateGoal" endpoint is added. */
+    var d = goalData[pendingGoal];
+    fetch('GoFit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'action=updateGoal&goal=' + encodeURIComponent(d.label)
+    }).then(function(res) {
+      if (!res.ok) throw new Error('Server returned ' + res.status);
+      return res.json();
+    }).then(function(data) {
+      currentGoal = pendingGoal;
+      closeModal('goal');
+      location.reload(); // refresh so goal + recalculated calorie target reflect the saved server value
+    }).catch(function(err) { alert('Could not save goal: ' + err.message); });
   }
 
   function updateBMI() {

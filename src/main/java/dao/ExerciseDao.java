@@ -52,7 +52,7 @@ public class ExerciseDao {
         return list;
     }
 
-    // ── NEW: same as findByUserToday but for any given date (used for date-nav / "past days") ──
+    
     public List<ExerciseLog> findByUserAndDate(int userId, Date date) {
         String sql = "SELECT * FROM exerciseLogs WHERE userId = ? AND logDate = ? ORDER BY createdAt DESC";
         List<ExerciseLog> list = new ArrayList<>();
@@ -110,7 +110,6 @@ public class ExerciseDao {
         return 0;
     }
 
-    // ── NEW: same as countToday but for any given date (used for dashboard-by-date, if ever needed) ──
     public int countByDate(int userId, Date date) {
         String sql = "SELECT COUNT(*) FROM exerciseLogs WHERE userId = ? AND logDate = ?";
         try (Connection con = DBConnection.getconnection();

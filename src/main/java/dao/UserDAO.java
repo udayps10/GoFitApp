@@ -52,15 +52,38 @@ public class UserDAO {
         return null;
     }
 
-    // ── NEW: actually save an updated weight to the database. Without this,
-    // the dashboard's "Update Weight" modal only changed the number on screen
-    // and never touched the users table — so it looked saved but reset on
-    // every login/refresh. ──
     public boolean updateWeight(int userId, double weightKg) {
         String sql = "UPDATE users SET weightKg = ? WHERE id = ?";
         try (Connection con = DBConnection.getconnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setDouble(1, weightKg);
+            ps.setInt(2, userId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean updateGoal(int userId, String goal, int calorieGoal) {
+        String sql = "UPDATE users SET goal = ?, calorieGoal = ? WHERE id = ?";
+        try (Connection con = DBConnection.getconnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, goal);
+            ps.setInt(2, calorieGoal);
+            ps.setInt(3, userId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean updateCalorieGoal(int userId, int calorieGoal) {
+        String sql = "UPDATE users SET calorieGoal = ? WHERE id = ?";
+        try (Connection con = DBConnection.getconnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, calorieGoal);
             ps.setInt(2, userId);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {

@@ -66,7 +66,6 @@ return status;
         return 0;
     }
 
-    // ── NEW: same as totalKcalToday but for any given date (used for date-nav / "past days") ──
     public int totalKcalByDate(int userId, Date date) {
         String sql = "SELECT SUM(kcal) FROM calorieLogs WHERE userId = ? AND logDate = ?";
         try (Connection conn = DBConnection.getconnection();
@@ -111,7 +110,6 @@ return status;
         return list;
     }
 
-    // ── NEW: same as findByUserToday but for any given date (used for date-nav / "past days") ──
     public List<CalorieLog> findByUserAndDate(int userId, Date date) {
         String sql = "SELECT * FROM calorieLogs WHERE userId = ? AND logDate = ? ORDER BY createdAt DESC";
         List<CalorieLog> list = new ArrayList<>();
