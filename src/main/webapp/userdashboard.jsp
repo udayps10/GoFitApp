@@ -552,15 +552,15 @@
     <div class="nav-brand">
       <span class="brand-icon">💪</span> GoFit
     </div>
-    <a href="GoFit?page=dashboard" class="nav-item active">
+    <a href="<%=request.getContextPath()%>/GoFit?page=dashboard" class="nav-item active">
       <span class="nav-icon">📊</span>
       <div><div>Dashboard</div></div>
     </a>
-    <a href="GoFit?page=calorie" class="nav-item">
+    <a href="<%=request.getContextPath()%>/GoFit?page=calorie" class="nav-item">
       <span class="nav-icon">🍎</span>
       <div><div>Food Tracking</div></div>
     </a>
-    <a href="GoFit?page=workout" class="nav-item">
+    <a href="<%=request.getContextPath()%>/GoFit?page=workout" class="nav-item">
       <span class="nav-icon">🏋️</span>
       <div><div>Workout</div></div>
     </a>
@@ -688,7 +688,7 @@
   <div class="section-card">
     <div class="section-title">🥗 Quick-Add Food</div>
     <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">
-      Items you add here are saved immediately. See your full list on the <a href="GoFit?page=calorie" style="color:var(--green);">Food Tracking</a> page.
+      Items you add here are saved immediately. See your full list on the <a href="<%=request.getContextPath()%>/GoFit?page=calorie" style="color:var(--green);">Food Tracking</a> page.
     </p>
     <button class="add-btn" id="add-food-btn" onclick="openModal('food')">+ Add Food</button>
   </div>
@@ -697,7 +697,7 @@
   <div class="section-card">
     <div class="section-title">🏋️ Quick-Add Workout</div>
     <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">
-      Items you add here are saved immediately. See your full list on the <a href="GoFit?page=workout" style="color:var(--green);">Workout</a> page.
+      Items you add here are saved immediately. See your full list on the <a href="<%=request.getContextPath()%>/GoFit?page=workout" style="color:var(--green);">Workout</a> page.
     </p>
     <button class="add-btn" id="add-workout-btn" onclick="openModal('workout')">+ Add Exercise</button>
   </div>
@@ -859,6 +859,7 @@
   var CONSUMED_KCAL = <%= totalKcal %>;
   var heightCm = <%= heightCmVal %>;
   var weightKg = <%= (weightKgVal > 0) ? weightKgVal : 0 %>;
+  var contextPath = '<%=request.getContextPath()%>';
 
   /* ===== HAMBURGER MENU ===== */
   function toggleMenu() {
@@ -984,7 +985,7 @@
   }
 
   function persistFood(name, serving, kcal, carbs, protein, fat) {
-    fetch('GoFit', {
+    fetch(contextPath + '/GoFit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: 'action=addCalorie'
@@ -1009,7 +1010,7 @@
     var reps = document.getElementById('ex-reps').value || 0;
     var wt = document.getElementById('ex-weight').value || 0;
     if (!name) { alert('Please enter an exercise name'); return; }
-    fetch('GoFit', {
+    fetch(contextPath + '/GoFit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: 'action=addExercise'
@@ -1028,7 +1029,7 @@
   function saveWeight() {
     var val = parseFloat(document.getElementById('new-weight').value);
     if (!val) return;
-    fetch('GoFit', {
+    fetch(contextPath + '/GoFit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: 'action=updateWeight&weightKg=' + encodeURIComponent(val)
@@ -1058,7 +1059,7 @@
 
   function saveGoal() {
     var d = goalData[pendingGoal];
-    fetch('GoFit', {
+    fetch(contextPath + '/GoFit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: 'action=updateGoal&goal=' + encodeURIComponent(d.label)
@@ -1182,7 +1183,7 @@
     if (!capturedB64) return;
     setScanLoad(true);
     hideScanResult();
-    fetch('GoFit?action=aiScanFood', {
+    fetch(contextPath + '/GoFit?action=aiScanFood', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ imageBase64: capturedB64, mimeType: capturedMime })
@@ -1213,7 +1214,7 @@
 
   function logScanned() {
     var saves = scannedItems.map(function(item) {
-      return fetch('GoFit', {
+      return fetch(contextPath + '/GoFit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: 'action=addCalorie'

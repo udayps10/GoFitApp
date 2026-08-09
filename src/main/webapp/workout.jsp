@@ -537,7 +537,7 @@
 </svg>
 <!-- NAVBAR -->
 <nav>
-  <a href="GoFit?page=dashboard" class="nav-brand">
+  <a href="<%=request.getContextPath()%>/GoFit?page=dashboard" class="nav-brand">
     <div class="logo-box">💪</div>
     <span class="logo-text">GoFit</span>
   </a>
@@ -554,9 +554,9 @@
   <div class="nav-brand-row">
     <span class="nav-brand-icon">💪</span> GoFit
   </div>
-  <a href="GoFit?page=dashboard"><span class="nav-icon">📊</span> Dashboard</a>
-  <a href="GoFit?page=calorie"><span class="nav-icon">🍎</span> Food Tracking</a>
-  <a href="GoFit?page=workout" class="active"><span class="nav-icon">🏋️</span> Workout</a>
+  <a href="<%=request.getContextPath()%>/GoFit?page=dashboard"><span class="nav-icon">📊</span> Dashboard</a>
+  <a href="<%=request.getContextPath()%>/GoFit?page=calorie"><span class="nav-icon">🍎</span> Food Tracking</a>
+  <a href="<%=request.getContextPath()%>/GoFit?page=workout" class="active"><span class="nav-icon">🏋️</span> Workout</a>
   <div class="nav-divider"></div>
   <div class="nav-logout" onclick="logout()"><span class="nav-icon">🚪</span> Logout</div>
 </div>
@@ -582,7 +582,7 @@
   <% if (isToday) { %>
   <div class="card">
     <div class="card-label">Log Exercise</div>
-    <form action="GoFit" method="post">
+    <form action="<%=request.getContextPath()%>/GoFit" method="post">
       <input type="hidden" name="action" value="addExercise">
       <div class="input-labels">
         <span class="name-lbl">Exercise</span>
@@ -658,6 +658,7 @@
 %>
   ];
   // ── Server-provided date state (from ?date=yyyy-MM-dd, defaults to today) ──
+  var contextPath = '<%=request.getContextPath()%>';
   var SELECTED_DATE = "<%= selectedDateStr %>"; // yyyy-MM-dd
   var IS_TODAY = <%= isToday %>;
   var data      = {};
@@ -1370,7 +1371,7 @@ function searchExercises(query) {
   function deleteExercise(id, event) {
     event.stopPropagation();
     if (!id) return; // not-yet-saved items can't be deleted server-side
-    fetch('GoFit', {
+    fetch(contextPath + '/GoFit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: 'action=deleteExercise&id=' + encodeURIComponent(id)

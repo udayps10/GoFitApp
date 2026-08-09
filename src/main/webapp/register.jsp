@@ -323,7 +323,7 @@
     </div>
     <span class="logo-name">GoFit</span>
   </div>
-<form id="registerForm" action="GoFit" method="post" onsubmit="return false;">
+<form id="registerForm" action="<%=request.getContextPath()%>/GoFit" method="post" onsubmit="return false;">
 <input type="hidden" name="action" value="register">
   <div class="progress-wrap">
     <div class="progress-bar active" id="p1"></div>

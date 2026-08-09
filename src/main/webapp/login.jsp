@@ -255,7 +255,18 @@
     <h1>Welcome back</h1>
     <p class="subtitle">Sign in to continue your journey.</p>
 
-    <form action="GoFit" method="post">
+    <%
+        String error = request.getParameter("error");
+        if ("invalid".equals(error)) {
+    %>
+    <div style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; padding: 12px; margin-bottom: 20px; color: #ef4444; font-size: 0.85rem;">
+        ❌ Invalid email or password. Please try again.
+    </div>
+    <%
+        }
+    %>
+
+    <form action="<%=request.getContextPath()%>/GoFit" method="post">
     <input type="hidden" name="action" value="login">
     <div class="input-group">
         <label for="user">Email</label>

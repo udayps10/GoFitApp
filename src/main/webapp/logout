@@ -115,7 +115,7 @@
 </style>
 </head>
 <body>
-<form action="GoFit" method="post">
+<form action="<%=request.getContextPath()%>/GoFit" method="post">
 <input type="hidden" name="action" value="logout">
 
 <div class="card">
@@ -148,7 +148,7 @@
 
   <button type="submit" class="btn-logout">Log out</button>
   <div class="divider">or</div>
-  <button type="button" class="btn-stay" onclick="window.location.href='userdashboard.jsp'">Stay on GoFit</button>
+  <button type="button" class="btn-stay" onclick="window.location.href='<%=request.getContextPath()%>/userdashboard.jsp'">Stay on GoFit</button>
 </div>
 </form>
 

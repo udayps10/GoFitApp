@@ -226,8 +226,8 @@
     <span class="nav-brand-icon">💪</span> GoFit
   </div>
   <a href="userdashboard.jsp"><span class="nav-icon">📊</span> Dashboard</a>
-  <a href="GoFit?page=calorie" class="active"><span class="nav-icon">🍎</span> Food Tracking</a>
-  <a href="GoFit?page=workout"><span class="nav-icon">🏋️</span> Workout</a>
+  <a href="<%=request.getContextPath()%>/GoFit?page=calorie" class="active"><span class="nav-icon">🍎</span> Food Tracking</a>
+  <a href="<%=request.getContextPath()%>/GoFit?page=workout"><span class="nav-icon">🏋️</span> Workout</a>
   <div class="nav-divider"></div>
   <div class="nav-logout" onclick="logout()"><span class="nav-icon">🚪</span> Logout</div>
 </div>
@@ -332,7 +332,7 @@
     </div>
 
     <div class="tab-panel active" id="panel-manual">
-      <form action="GoFit" method="post" id="manualForm">
+      <form action="<%=request.getContextPath()%>/GoFit" method="post" id="manualForm">
         <input type="hidden" name="action" value="addCalorie">
         <div class="input-row">
           <input type="text"   name="foodName" id="foodNameInput" placeholder="Food name (e.g. Roti, Dal, Chicken curry)" list="foodDatalist" autocomplete="off" required />
@@ -405,6 +405,7 @@
 
 <script>
   // ── Server-provided date state (from ?date=yyyy-MM-dd, defaults to today) ──
+  var contextPath = '<%=request.getContextPath()%>';
   var SELECTED_DATE = "<%= selectedDateStr %>"; // yyyy-MM-dd
   var IS_TODAY = <%= isToday %>;
   var dayOffset = 0;
@@ -492,7 +493,7 @@
   data[SELECTED_DATE] = todayItems; // todayItems is really "items for SELECTED_DATE" — server already filtered by date
 
   function saveFoodToServer(name, serving, kcal, carbs, protein, fat) {
-    return fetch('GoFit', {
+    return fetch(contextPath + '/GoFit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: 'action=addCalorie'
@@ -603,7 +604,7 @@
 
   function deleteFood(id){
     if (!id) return;
-    fetch('GoFit', {
+    fetch(contextPath + '/GoFit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: 'action=deleteCalorie&id=' + encodeURIComponent(id)
@@ -733,7 +734,7 @@
   function scanWithGemini(){
     if(!capturedB64){showToast('Take or upload a photo first');return;}
     setScanLoading(true); hideAiResult();
-    fetch('GoFit?action=aiScanFood', {
+    fetch(contextPath + '/GoFit?action=aiScanFood', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ imageBase64: capturedB64, mimeType: capturedMime })
