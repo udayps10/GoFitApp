@@ -8,14 +8,13 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import model.CalorieLog;
 import util.DBConnection;
 
 public class CalorieLogDAO{
 
     public boolean insert(CalorieLog log) {
     	boolean status = false;
-    	String sql = "INSERT INTO calorieLogs (userId, foodName, serving, kcal, carbsG, proteinG, fatG) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO calorie_logs (userId, foodName, serving, kcal, carbsG, proteinG, fatG) VALUES (?, ?, ?, ?, ?, ?, ?)";
     	try (Connection con = DBConnection.getconnection();
     			PreparedStatement ps = con.prepareStatement(sql)) {
     				ps.setInt(1, log.getUserId());
@@ -37,7 +36,7 @@ return status;
 
       
     } public boolean delete(int id, int userId) {
-        String sql = "DELETE FROM calorieLogs WHERE id = ? AND userId = ?";
+        String sql = "DELETE FROM calorie_logs WHERE id = ? AND userId = ?";
         try (Connection conn = DBConnection.getconnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
  
@@ -52,7 +51,7 @@ return status;
     }
     
     public int totalKcalToday(int userId) {
-        String sql = "SELECT SUM(kcal) FROM calorieLogs WHERE userId = ? AND logDate = CURDATE()";
+        String sql = "SELECT SUM(kcal) FROM calorie_logs WHERE userId = ? AND logged_date = CURDATE()";
         try (Connection conn = DBConnection.getconnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
  
@@ -67,7 +66,7 @@ return status;
     }
 
     public int totalKcalByDate(int userId, Date date) {
-        String sql = "SELECT SUM(kcal) FROM calorieLogs WHERE userId = ? AND logDate = ?";
+        String sql = "SELECT SUM(kcal) FROM calorie_logs WHERE userId = ? AND logged_date = ?";
         try (Connection conn = DBConnection.getconnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -83,7 +82,7 @@ return status;
     }
     
     public List<CalorieLog> findByUserToday(int userId) {
-        String sql = "SELECT * FROM calorieLogs WHERE userId = ? AND logDate = CURDATE() ORDER BY createdAt DESC";
+        String sql = "SELECT * FROM calorie_logs WHERE userId = ? AND logged_date = CURDATE() ORDER BY created_at DESC";
         List<CalorieLog> list = new ArrayList<>();
         try (Connection conn = DBConnection.getconnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -100,7 +99,7 @@ return status;
                 log.setCarbsG(rs.getDouble("carbsG"));
                 log.setProteinG(rs.getDouble("proteinG"));
                 log.setFatG(rs.getDouble("fatG"));
-                log.setLogDate(rs.getDate("logDate"));
+                log.setLogDate(rs.getDate("logged_date"));
                 list.add(log);
             }
  
@@ -111,7 +110,7 @@ return status;
     }
 
     public List<CalorieLog> findByUserAndDate(int userId, Date date) {
-        String sql = "SELECT * FROM calorieLogs WHERE userId = ? AND logDate = ? ORDER BY createdAt DESC";
+        String sql = "SELECT * FROM calorie_logs WHERE userId = ? AND logged_date = ? ORDER BY created_at DESC";
         List<CalorieLog> list = new ArrayList<>();
         try (Connection conn = DBConnection.getconnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -129,7 +128,7 @@ return status;
                 log.setCarbsG(rs.getDouble("carbsG"));
                 log.setProteinG(rs.getDouble("proteinG"));
                 log.setFatG(rs.getDouble("fatG"));
-                log.setLogDate(rs.getDate("logDate"));
+                log.setLogDate(rs.getDate("logged_date"));
                 list.add(log);
             }
 
@@ -140,7 +139,7 @@ return status;
     }
 
     public int totalfatToday(int userId) {
-        String sql = "SELECT SUM(fatG) FROM calorieLogs WHERE userId = ? AND logDate = CURDATE()";
+        String sql = "SELECT SUM(fatG) FROM calorie_logs WHERE userId = ? AND logged_date = CURDATE()";
         try (Connection conn = DBConnection.getconnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
  
@@ -155,7 +154,7 @@ return status;
     }
 
     public int totalproteinToday(int userId) {
-        String sql = "SELECT SUM(proteinG) FROM calorieLogs WHERE userId = ? AND logDate = CURDATE()";
+        String sql = "SELECT SUM(proteinG) FROM calorie_logs WHERE userId = ? AND logged_date = CURDATE()";
         try (Connection conn = DBConnection.getconnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
  
