@@ -116,7 +116,8 @@ public class GoFitServlet extends HttpServlet {
             }
 
         } else if (action.equals("login")) {
-            String email    = req.getParameter("email");
+            String email    = req.getParameter("email") == null
+                    ? "" : req.getParameter("email").trim().toLowerCase();
             String password = req.getParameter("password");
 
             System.out.println("🔐 Login attempt: email=" + email);
