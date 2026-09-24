@@ -204,4 +204,4 @@ Feel free to fork this repository and submit a pull request.
 
 ## 👨‍💻 Built By
 
-**Uday** — GoFit v1.0 · 2026
+**Udaypratap Singh ** — GoFit v1.0 · 2026 
