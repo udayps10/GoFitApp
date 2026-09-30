@@ -42,7 +42,7 @@
 Option A - Using MySQL Command Line:
 ```bash
 mysql -u root -p
-Enter password: Uday@2006
+Enter password: &lt;your_mysql_password&gt;
 
 # Paste the contents of database_setup.sql
 ```

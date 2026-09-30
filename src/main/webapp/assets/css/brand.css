@@ -1,0 +1,27 @@
+/* The GoFit mark is a square icon - show it in full, never cropped. */
+.gofit-logo {
+  display: inline-block;
+  position: relative;
+  width: 44px;
+  max-width: 100%;
+  overflow: hidden;
+  flex-shrink: 0;
+  vertical-align: middle;
+  background: #000;
+  border-radius: 8px;
+  line-height: 0;
+}
+.gofit-logo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: none;
+}
+.logo .gofit-logo { width: 76px; border-radius: 14px; }
+.login-container .logo .gofit-logo { width: 88px; border-radius: 16px; }
+.footer-logo .gofit-logo { width: 44px; }
+.sidebar-label .gofit-logo { width: 34px; border-radius: 6px; }
+.nav-logo .gofit-logo, .nav-brand .gofit-logo { width: 42px; border-radius: 8px; }
+@media (max-width: 480px) {
+  .nav-logo .gofit-logo, .nav-brand .gofit-logo { width: 36px; }
+}

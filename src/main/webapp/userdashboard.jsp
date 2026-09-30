@@ -511,11 +511,6 @@
     border-bottom: 1px solid var(--border);
     font-size: 15px; font-weight: 700; color: var(--text);
   }
-  .nav-brand .brand-icon {
-    background: var(--green); color: #000;
-    padding: 3px 7px; border-radius: 6px; font-size: 14px;
-  }
-
   .nav-item {
     display: flex; align-items: center; gap: 10px;
     padding: 11px 16px; font-size: 14px; font-weight: 500;
@@ -541,6 +536,7 @@
   }
   .nav-overlay.open { display: block; }
 </style>
+<link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/brand.css">
 </head>
 <body>
 <div class="app-container">
@@ -550,7 +546,7 @@
   <!-- HAMBURGER DROPDOWN -->
   <div class="nav-dropdown" id="navDropdown">
     <div class="nav-brand">
-      <span class="brand-icon">💪</span> GoFit
+      <%@ include file="/WEB-INF/fragments/logo.jspf" %>
     </div>
     <a href="<%=request.getContextPath()%>/GoFit?page=dashboard" class="nav-item active">
       <span class="nav-icon">📊</span>
@@ -565,7 +561,7 @@
       <div><div>Workout</div></div>
     </a>
     <div class="nav-divider"></div>
-    <a href="logout.jsp" class="nav-logout">
+    <a href="<%=request.getContextPath()%>/logout.jsp" class="nav-logout">
       <span class="nav-icon">🚪</span>
       <div>Logout</div>
     </a>

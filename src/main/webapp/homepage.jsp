@@ -42,8 +42,6 @@
       border-bottom: 1px solid rgba(255,255,255,0.05);
     }
     .nav-logo { display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: var(--white); }
-    .nav-logo .dot { color: var(--green); }
-    .logo-icon { width: 36px; height: 36px; background: var(--green); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
     .nav-links { display: flex; gap: 32px; list-style: none; }
     .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 15px; font-weight: 500; transition: color .2s; }
     .nav-links a:hover { color: var(--white); }
@@ -203,7 +201,6 @@
     /* FOOTER */
     footer { border-top: 1px solid var(--card-border); padding: 40px 40px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; color: var(--text-muted); font-size: 14px; }
     .footer-logo { font-size: 18px; font-weight: 800; color: var(--white); }
-    .footer-logo span { color: var(--green); }
     .footer-links { display: flex; gap: 24px; }
     .footer-links a { color: var(--text-muted); text-decoration: none; font-size: 14px; transition: color .2s; }
     .footer-links a:hover { color: var(--white); }
@@ -225,14 +222,14 @@
       .preview-stats { grid-template-columns: 1fr; }
     }
   </style>
+<link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/brand.css">
 </head>
 <body>
 
 <!-- NAV -->
 <nav>
   <div class="nav-logo">
-    <div class="logo-icon">💪</div>
-    GoFit<span class="dot">.</span>
+    <%@ include file="/WEB-INF/fragments/logo.jspf" %>
   </div>
   <ul class="nav-links">
     
@@ -273,7 +270,7 @@
       </div>
       <div class="preview-body">
         <div class="preview-sidebar">
-          <div class="sidebar-label">GoFit</div>
+          <div class="sidebar-label"><%@ include file="/WEB-INF/fragments/logo.jspf" %></div>
           <div class="sidebar-item active"><span class="sidebar-icon">📊</span> Dashboard</div>
           <div class="sidebar-item"><span class="sidebar-icon">🍎</span> Calories</div>
           <div class="sidebar-item"><span class="sidebar-icon">⚖️</span> Weight</div>
@@ -479,7 +476,7 @@
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-logo">GoFit<span>.</span></div>
+  <div class="footer-logo"><%@ include file="/WEB-INF/fragments/logo.jspf" %></div>
   <div class="footer-links">
     <a href="#">Privacy</a>
     <a href="#">Terms</a>

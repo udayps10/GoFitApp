@@ -11,7 +11,7 @@ public class UserDAO {
         try (Connection con = DBConnection.getconnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, user.getName());
-            ps.setString(2, user.getEmail());
+            ps.setString(2, normalizeEmail(user.getEmail()));
             ps.setString(3, PasswordUtil.hashPassword(user.getPassword())); 
             ps.setInt(4, user.getAge());
             ps.setDouble(5, user.getWeightKg());
@@ -24,17 +24,37 @@ public class UserDAO {
             return false;
         }
     }
+    public boolean emailExists(String email) {
+        String sql = "SELECT 1 FROM users WHERE email = ? LIMIT 1";
+        try (Connection con = DBConnection.getconnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, normalizeEmail(email));
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public User login(String email, String enteredpassword) {
         String sql = "SELECT * FROM users WHERE email = ?"; 
         try (Connection con = DBConnection.getconnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, email);
+            ps.setString(1, normalizeEmail(email));
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 String hashedPassword = rs.getString("password");
-                if (!PasswordUtil.checkPassword(enteredpassword, hashedPassword)) {
-                    return null; 
+                boolean validPassword = PasswordUtil.checkPassword(enteredpassword, hashedPassword);
+                if (!validPassword && enteredpassword != null
+                        && enteredpassword.equals(hashedPassword)) {
+                    validPassword = true;
+                    updatePassword(rs.getInt("id"), enteredpassword);
                 }
+                if (!validPassword) {
+                    return null;
+                }
+
                 User user = new User();
                 user.setId(rs.getInt("id"));
                 user.setName(rs.getString("name"));
@@ -50,6 +70,22 @@ public class UserDAO {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private String normalizeEmail(String email) {
+        return email == null ? "" : email.trim().toLowerCase();
+    }
+
+    private void updatePassword(int userId, String plainPassword) {
+        String sql = "UPDATE users SET password = ? WHERE id = ?";
+        try (Connection con = DBConnection.getconnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, PasswordUtil.hashPassword(plainPassword));
+            ps.setInt(2, userId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean updateWeight(int userId, double weightKg) {

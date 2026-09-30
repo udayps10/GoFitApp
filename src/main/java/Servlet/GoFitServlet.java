@@ -28,6 +28,7 @@ public class GoFitServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
 
+        req.setCharacterEncoding("UTF-8");
         String action = req.getParameter("action");
         HttpSession session = req.getSession();
 
@@ -93,7 +94,8 @@ public class GoFitServlet extends HttpServlet {
         if (action.equals("register")) {
             User user = new User();
             user.setName(req.getParameter("name"));
-            user.setEmail(req.getParameter("email"));
+            user.setEmail(req.getParameter("email") == null
+                    ? null : req.getParameter("email").trim().toLowerCase());
             user.setPassword(req.getParameter("password"));
             user.setGoal(req.getParameter("goal"));
 
@@ -109,10 +111,15 @@ public class GoFitServlet extends HttpServlet {
             );
             user.setCalorieGoal(aiCalories);
 
-            if (userDAO.register(user)) {
+            if (userDAO.emailExists(user.getEmail())) {
+                System.out.println("⚠️ Register blocked, email already exists: " + user.getEmail());
+                res.sendRedirect(req.getContextPath() + "/register.jsp?error=exists");
+            } else if (userDAO.register(user)) {
+                System.out.println("✅ Registered: " + user.getEmail());
                 res.sendRedirect(req.getContextPath() + "/login.jsp?success=registered");
             } else {
-                res.sendRedirect(req.getContextPath() + "/register.jsp?error=exists");
+                System.out.println("❌ Register failed (DB insert): " + user.getEmail());
+                res.sendRedirect(req.getContextPath() + "/register.jsp?error=failed");
             }
 
         } else if (action.equals("login")) {
@@ -189,7 +196,10 @@ public class GoFitServlet extends HttpServlet {
             catch (Exception e) { log.setFatG(0); }
 
             try {
-                calorieDAO.insert(log);
+                if (!calorieDAO.insert(log)) {
+                    res.sendError(500, "Food log could not be saved");
+                    return;
+                }
                 res.sendRedirect(req.getContextPath() + "/GoFit?page=calorie");
             } catch (Exception e) {
                 e.printStackTrace();
@@ -362,6 +372,10 @@ public class GoFitServlet extends HttpServlet {
 
     private int fetchCalorieGoalFromAI(int age, double weightKg, double heightCm, String goal) {
         try {
+            if (GEMINI_API_KEY == null || GEMINI_API_KEY.trim().isEmpty()) {
+                throw new IllegalStateException("GEMINI_API_KEY is not set");
+            }
+
             String prompt = "A user wants to " + goal + ". They are " + age +
                 " years old, weigh " + weightKg + "kg, and are " + heightCm +
                 "cm tall. Calculate their daily calorie target using the Mifflin-St Jeor " +

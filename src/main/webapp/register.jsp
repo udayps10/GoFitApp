@@ -86,21 +86,6 @@
     display: flex; align-items: center; gap: 10px;
     margin-bottom: 30px;
   }
-  .logo-icon {
-    width: 36px; height: 36px;
-    background: var(--green);
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 0 16px rgba(74,222,128,0.35);
-  }
-  .logo-icon svg { width: 20px; height: 20px; }
-  .logo-name {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.4rem;
-    letter-spacing: -0.02em;
-    color: var(--text);
-  }
-
   .progress-wrap {
     display: flex; gap: 6px;
     margin-bottom: 26px;
@@ -284,7 +269,29 @@
     color: var(--muted); font-weight: 500;
     min-height: 14px;
   }
+
+  .form-msg {
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    line-height: 1.45;
+  }
+  .form-msg.err {
+    background: var(--red-bg);
+    border: 1px solid var(--red-border);
+    color: var(--red);
+  }
+  .form-msg.ok {
+    background: rgba(74,222,128,0.08);
+    border: 1px solid rgba(74,222,128,0.35);
+    color: var(--green);
+  }
+  .form-msg a { color: inherit; font-weight: 700; }
+  .form-msg a:hover { text-decoration: underline; }
 </style>
+<link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/brand.css">
 </head>
 <body>
 
@@ -314,15 +321,32 @@
 
 <div class="card">
   <div class="logo">
-    <div class="logo-icon">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M6 12h2M16 12h2M8 12V9a1 1 0 011-1h6a1 1 0 011 1v3M8 12v3a1 1 0 001 1h6a1 1 0 001-1v-3" stroke="#071a0a" stroke-width="2" stroke-linecap="round"/>
-        <circle cx="4" cy="12" r="2" fill="#071a0a"/>
-        <circle cx="20" cy="12" r="2" fill="#071a0a"/>
-      </svg>
-    </div>
-    <span class="logo-name">GoFit</span>
+    <%@ include file="/WEB-INF/fragments/logo.jspf" %>
   </div>
+<%
+    String regError = request.getParameter("error");
+    if ("exists".equals(regError)) {
+%>
+  <div class="form-msg err">
+    An account with that email already exists.
+    <a href="<%=request.getContextPath()%>/login.jsp">Log in instead</a>.
+  </div>
+<%
+    } else if (regError != null) {
+%>
+  <div class="form-msg err">
+    Registration failed &mdash; we couldn't save your account. Please try again.
+  </div>
+<%
+    } else if ("registered".equals(request.getParameter("success"))) {
+%>
+  <div class="form-msg ok">Account created. You can now log in.</div>
+<%
+    }
+%>
+<noscript>
+  <div class="form-msg err">JavaScript is disabled. Enable it to submit this form.</div>
+</noscript>
 <form id="registerForm" action="<%=request.getContextPath()%>/GoFit" method="post" onsubmit="return false;">
 <input type="hidden" name="action" value="register">
   <div class="progress-wrap">

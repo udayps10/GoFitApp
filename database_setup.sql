@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS exercise_logs (
     exerciseName VARCHAR(255) NOT NULL,
     weightKg DOUBLE DEFAULT 0,
     reps INT DEFAULT 0,
-    logged_date DATE DEFAULT CURDATE(),
+    logged_date DATE DEFAULT (CURRENT_DATE),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
 );
@@ -38,12 +38,7 @@ CREATE TABLE IF NOT EXISTS calorie_logs (
     carbsG DOUBLE DEFAULT 0,
     proteinG DOUBLE DEFAULT 0,
     fatG DOUBLE DEFAULT 0,
-    logged_date DATE DEFAULT CURDATE(),
+    logged_date DATE DEFAULT (CURRENT_DATE),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
 );
-
--- Sample user for testing (password: Test@123)
--- The actual password stored will be hashed
-INSERT INTO users (name, email, password, age, weightKg, heightCm, goal, calorieGoal) 
-VALUES ('Test User', 'test@example.com', 'hashed_password_here', 25, 75, 175, 'Maintain Weight', 2000);

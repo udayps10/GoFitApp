@@ -1,2 +1,8 @@
 "src/main/java/Servlet/" 
 "src/main/java/util/" 
+
+# IDE
+.idea/
+*.iml
+.vscode/
+

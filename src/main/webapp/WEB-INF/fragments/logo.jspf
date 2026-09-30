@@ -1,0 +1,1 @@
+<span class="gofit-logo"><img src="<%=request.getContextPath()%>/assets/images/gofit-logo.png" alt="GoFit" width="135" height="130"></span>

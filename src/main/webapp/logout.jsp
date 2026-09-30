@@ -1,4 +1,4 @@
- <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%> <!DOCTYPE html>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%> <!DOCTYPE html>
  
 <html lang="en">
 <head>
@@ -69,14 +69,6 @@
     gap: 10px;
     margin-bottom: 30px;
   }
-  .logo-mark {
-    width: 36px; height: 36px; border-radius: 10px;
-    background: var(--green);
-    display: flex; align-items: center; justify-content: center;
-  }
-  .logo-text { font-size: 22px; font-weight: 800; color: #fff; }
-  .logo-text em { color: var(--green); font-style: normal; }
-
   h2 { font-size: 22px; font-weight: 800; margin-bottom: 10px; }
   .sub { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 28px; }
 
@@ -113,6 +105,7 @@
   .divider { margin: 15px 0; font-size: 12px; color: var(--muted2); }
 
 </style>
+<link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/brand.css">
 </head>
 <body>
 <form action="<%=request.getContextPath()%>/GoFit" method="post">
@@ -120,12 +113,7 @@
 
 <div class="card">
   <div class="logo">
-    <div class="logo-mark">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M6 4v16M18 4v16M3 8h3M18 8h3M3 16h3M18 16h3M6 8h12M6 16h12"/>
-      </svg>
-    </div>
-    <span class="logo-text">Go<em>Fit</em></span>
+    <%@ include file="/WEB-INF/fragments/logo.jspf" %>
   </div>
 
   <h2>Log out of GoFit?</h2>
@@ -148,7 +136,7 @@
 
   <button type="submit" class="btn-logout">Log out</button>
   <div class="divider">or</div>
-  <button type="button" class="btn-stay" onclick="window.location.href='<%=request.getContextPath()%>/userdashboard.jsp'">Stay on GoFit</button>
+  <button type="button" class="btn-stay" onclick="window.location.href='<%=request.getContextPath()%>/GoFit?page=dashboard'">Stay on GoFit</button>
 </div>
 </form>
 

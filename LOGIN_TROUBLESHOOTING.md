@@ -80,10 +80,10 @@ CREATE TABLE IF NOT EXISTS calorie_logs (
 ### Issue: "Database connection FAILED" on dbtest.jsp
 **Solution:**
 - Ensure MySQL is running
-- Check DBConnection.java has correct credentials:
-  - URL: `jdbc:mysql://localhost:3306/gofit`
-  - USER: `root`
-  - PASSWORD: `Uday@2006`
+- Check the `DB_URL`, `DB_USER` and `DB_PASSWORD` environment variables:
+  - DB_URL: `jdbc:mysql://localhost:3306/gofit?allowPublicKeyRetrieval=true&useSSL=false`
+  - DB_USER: `root`
+  - DB_PASSWORD: `&lt;your_mysql_password&gt;` (set as an env var — never hardcode it)
 
 ### Issue: "No users found" on dbtest.jsp
 **Solution:**

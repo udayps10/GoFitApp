@@ -124,23 +124,37 @@ USE gofit;
 -- Then paste and run the contents of gofit_final.sql
 ```
 
-### 3. Configure DB connection
-Open `src/util/DBConnection.java` and update:
-```java
-private static final String URL      = "jdbc:mysql://localhost:3306/gofit?allowPublicKeyRetrieval=true&useSSL=false";
-private static final String USER     = "root";
-private static final String PASSWORD = "your_password_here";  // ← change this
+### 3. Configure environment variables
+
+Connection settings are read from the environment — nothing secret lives in the source.
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `DB_URL` | `jdbc:mysql://localhost:3306/gofit?allowPublicKeyRetrieval=true&useSSL=false` | JDBC connection string |
+| `DB_USER` | `root` | Database user |
+| `DB_PASSWORD` | *(empty)* | Database password — **set this, never commit it** |
+| `GEMINI_API_KEY` | *(none)* | Google Gemini key for AI food scanning. Without it the app falls back to the Mifflin-St Jeor formula for calorie goals |
+
+PowerShell (persists for your user):
+```powershell
+[Environment]::SetEnvironmentVariable("DB_PASSWORD", "<your_mysql_password>", "User")
+[Environment]::SetEnvironmentVariable("GEMINI_API_KEY", "<your_key>", "User")
 ```
 
-### 4. Add MySQL JDBC Driver
-Download `mysql-connector-j-x.x.x.jar` and place it in:
-```
-WebContent/WEB-INF/lib/
-```
+Docker / PaaS: pass them as container or service environment variables.
+
+### 4. MySQL JDBC Driver
+Already bundled at `src/main/webapp/WEB-INF/lib/mysql-connector-j-9.5.0.jar` (plus `jbcrypt-0.4.jar` for password hashing).
 
 ### 5. Run on Tomcat
 - Right-click project → Run on Server → Apache Tomcat
-- Open browser: `http://localhost:8080/GoFit/homepage.jsp`
+- Open browser: `http://localhost:8080/GOFIT/homepage.jsp`
+
+### 6. Build the WAR manually
+```powershell
+javac -encoding UTF-8 -cp "<tomcat>/lib/servlet-api.jar;src/main/webapp/WEB-INF/lib/*" -d build/classes (Get-ChildItem src/main/java -Recurse -Filter *.java).FullName
+# then package build/classes into GOFIT.war under WEB-INF/classes, or use the Dockerfile
+```
 
 ---
 
@@ -190,8 +204,8 @@ The `user` object (type `User`) is stored in session on login and removed on log
 
 ## 📌 Notes
 
-- Passwords are stored as plain text — add BCrypt hashing before deploying publicly.
-- The Gemini AI API key in `userdashboard.jsp` must be replaced with your own key from [Google AI Studio](https://aistudio.google.com).
+- Passwords are hashed with BCrypt (`util.PasswordUtil`); existing plain-text rows are re-hashed on first successful login.
+- The Gemini AI key is read from the `GEMINI_API_KEY` environment variable — get one from [Google AI Studio](https://aistudio.google.com). Registration still works without it; the calorie goal falls back to the Mifflin-St Jeor equation.
 - The app is designed as an MVP — future features like workout planning, sets tracking, and personal records can be added using the existing database architecture.
 
 

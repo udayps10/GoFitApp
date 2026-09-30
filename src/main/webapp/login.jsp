@@ -94,22 +94,6 @@
             gap: 10px;
         }
 
-        .logo-icon {
-            width: 42px; height: 42px;
-            background: var(--green);
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 20px rgba(74,222,128,0.35);
-        }
-        .logo-icon svg { width: 22px; height: 22px; }
-
-        .logo-name {
-            font-family: 'DM Serif Display', serif;
-            font-size: 1.6rem;
-            letter-spacing: -0.02em;
-            color: var(--text);
-        }
-
         h1 {
             font-family: 'DM Serif Display', serif;
             font-size: 1.9rem;
@@ -209,6 +193,7 @@
             transform: scale(0.98);
         }
     </style>
+<link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/brand.css">
 </head>
 <body>
 
@@ -242,14 +227,7 @@
 
 <div class="login-container">
     <div class="logo">
-        <div class="logo-icon">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M6 12h2M16 12h2M8 12V9a1 1 0 011-1h6a1 1 0 011 1v3M8 12v3a1 1 0 001 1h6a1 1 0 001-1v-3" stroke="#071a0a" stroke-width="2" stroke-linecap="round"/>
-                <circle cx="4" cy="12" r="2" fill="#071a0a"/>
-                <circle cx="20" cy="12" r="2" fill="#071a0a"/>
-            </svg>
-        </div>
-        <span class="logo-name">GoFit</span>
+        <%@ include file="/WEB-INF/fragments/logo.jspf" %>
     </div>
 
     <h1>Welcome back</h1>
@@ -261,6 +239,12 @@
     %>
     <div style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; padding: 12px; margin-bottom: 20px; color: #ef4444; font-size: 0.85rem;">
         ❌ Invalid email or password. Please try again.
+    </div>
+    <%
+        } else if ("registered".equals(request.getParameter("success"))) {
+    %>
+    <div style="background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.3); border-radius: 10px; padding: 12px; margin-bottom: 20px; color: #4ade80; font-size: 0.85rem;">
+        Account created. You can now log in.
     </div>
     <%
         }

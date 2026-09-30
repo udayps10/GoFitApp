@@ -55,8 +55,6 @@
   /* ---- NAVBAR (matches calorie.jsp) ---- */
   nav { background: #0b1220; border-bottom: 1px solid rgba(255,255,255,0.07); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; height: 58px; position: sticky; top: 0; z-index: 200; }
   .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-  .logo-box { width: 32px; height: 32px; background: #4ade80; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
-  .logo-text { font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: #f0f4f8; }
   .nav-right { display: flex; align-items: center; gap: 10px; }
   .ham-btn { background: none; border: none; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; width: 36px; height: 36px; padding: 4px; border-radius: 8px; transition: background 0.15s; flex-shrink: 0; }
   .ham-btn:hover { background: rgba(255,255,255,0.06); }
@@ -68,7 +66,6 @@
   @keyframes dropIn { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
   .nav-dropdown.open { display: flex; }
   .nav-brand-row { display: flex; align-items: center; gap: 8px; padding: 14px 16px 10px; border-bottom: 1px solid rgba(255,255,255,0.07); font-size: 15px; font-weight: 700; color: #f0f4f8; }
-  .nav-brand-icon { background: #4ade80; color: #000; padding: 3px 7px; border-radius: 6px; font-size: 14px; }
   .nav-dropdown a { display: flex; align-items: center; gap: 10px; color: #5a7291; text-decoration: none; font-size: 0.92rem; font-weight: 600; padding: 11px 16px; transition: color 0.15s, background 0.15s; }
   .nav-dropdown a .nav-icon { font-size: 17px; width: 22px; text-align: center; }
   .nav-dropdown a:hover { color: #f0f4f8; background: rgba(255,255,255,0.05); }
@@ -513,6 +510,7 @@
   .no-history { text-align: center; color: #5a7291; font-size: 0.83rem; padding: 20px 0; }
 
 </style>
+<link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/brand.css">
 </head>
 <body>
 <svg class="wave-bg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
@@ -538,8 +536,7 @@
 <!-- NAVBAR -->
 <nav>
   <a href="<%=request.getContextPath()%>/GoFit?page=dashboard" class="nav-brand">
-    <div class="logo-box">💪</div>
-    <span class="logo-text">GoFit</span>
+    <%@ include file="/WEB-INF/fragments/logo.jspf" %>
   </a>
   <div class="nav-right">
     <button class="ham-btn" id="hamBtn" onclick="toggleNav()" aria-label="Menu">
@@ -552,7 +549,7 @@
 
 <div class="nav-dropdown" id="navDropdown">
   <div class="nav-brand-row">
-    <span class="nav-brand-icon">💪</span> GoFit
+    <%@ include file="/WEB-INF/fragments/logo.jspf" %>
   </div>
   <a href="<%=request.getContextPath()%>/GoFit?page=dashboard"><span class="nav-icon">📊</span> Dashboard</a>
   <a href="<%=request.getContextPath()%>/GoFit?page=calorie"><span class="nav-icon">🍎</span> Food Tracking</a>
@@ -1285,7 +1282,7 @@ function searchExercises(query) {
     closeNav();
     if (!confirm('Log out of GoFit?')) return;
     var f = document.createElement('form');
-    f.method = 'POST'; f.action = 'GoFit';
+    f.method = 'POST'; f.action = '<%=request.getContextPath()%>/GoFit';
     var i = document.createElement('input');
     i.type = 'hidden'; i.name = 'action'; i.value = 'logout';
     f.appendChild(i);
