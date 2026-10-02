@@ -30,15 +30,48 @@
             if (con == null) {
     %>
                 <div class="status error">❌ Database connection FAILED</div>
-                <p>The application cannot connect to the MySQL database.</p>
-                <p><strong>Check:</strong></p>
-                <ul>
-                    <li>MySQL server is running</li>
-                    <li>Database credentials in DBConnection.java are correct</li>
-                    <li>Database 'gofit' exists</li>
-                    <li>Connection string: localhost:3306</li>
-                </ul>
-    <%
+<%
+                String envUrl    = System.getenv("DB_URL");
+                String envUser   = System.getenv("DB_USER");
+                String envPass   = System.getenv("DB_PASSWORD");
+                String envGemini = System.getenv("GEMINI_API_KEY");
+
+                String cfgUrl  = (envUrl  == null || envUrl.trim().isEmpty())
+                        ? "jdbc:mysql://localhost:3306/gofit?allowPublicKeyRetrieval=true&useSSL=false" : envUrl.trim();
+                String cfgUser = (envUser == null || envUser.trim().isEmpty()) ? "root" : envUser.trim();
+                String cfgPass = (envPass == null) ? "" : envPass;
+
+                String dbError;
+                try {
+                    Connection probe = DriverManager.getConnection(cfgUrl, cfgUser, cfgPass);
+                    probe.close();
+                    dbError = "probe succeeded - DBConnection is using different settings";
+                } catch (SQLException ex) {
+                    dbError = ex.getClass().getSimpleName() + ": " + ex.getMessage();
+                }
+                String esc = dbError.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+%>
+                <p><strong>SQL error:</strong> <code><%= esc %></code></p>
+
+                <h3>Environment variables on this server</h3>
+                <table>
+                    <tr><th>Variable</th><th>Value</th></tr>
+                    <tr><td>DB_URL</td><td><%= (envUrl == null || envUrl.trim().isEmpty())
+                            ? "<em>not set &rarr; falling back to jdbc:mysql://localhost:3306/gofit</em>"
+                            : envUrl.trim() %></td></tr>
+                    <tr><td>DB_USER</td><td><%= (envUser == null || envUser.trim().isEmpty())
+                            ? "<em>not set &rarr; falling back to root</em>"
+                            : envUser.trim() %></td></tr>
+                    <tr><td>DB_PASSWORD</td><td><%= (envPass == null || envPass.isEmpty())
+                            ? "<strong>NOT SET &rarr; using empty password</strong>"
+                            : "set (" + envPass.length() + " chars)" %></td></tr>
+                    <tr><td>GEMINI_API_KEY</td><td><%= (envGemini == null || envGemini.trim().isEmpty())
+                            ? "not set (optional)" : "set (" + envGemini.trim().length() + " chars)" %></td></tr>
+                </table>
+                <p><strong>Fix:</strong> define these where Tomcat runs (container env vars, systemd unit, or
+                   <code>catalina.properties</code>), then restart. The database must be reachable from
+                   <em>this</em> host &mdash; <code>localhost</code> inside a container is the container itself.</p>
+<%
             } else {
     %>
                 <div class="status success">✅ Database connection SUCCESS</div>
@@ -109,6 +142,8 @@
         3. Run database_setup.sql if tables are missing<br>
         4. Create a user account via <a href="register.jsp">Register</a><br>
         5. Try logging in with your credentials<br>
+        <strong>⚠️ This page exposes connection status and user emails &mdash; delete
+           <code>dbtest.jsp</code> from the deployed WAR once everything works.</strong><br>
         <a href="login.jsp">Back to Login</a>
     </p>
 </div>
