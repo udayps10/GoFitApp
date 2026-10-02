@@ -4,7 +4,7 @@
 set -uo pipefail
 
 ROOTPW='Uday@2006'
-APPPW='GoFitApp#2026SecurePass!'
+APPPW='Uday@2006'
 export MYSQL_PWD="$ROOTPW"
 
 echo "==> can we log into MySQL as root?"
@@ -14,17 +14,28 @@ if ! mysql -uroot -e "SELECT 1;" >/dev/null 2>&1; then
 fi
 echo "  yes"
 
-echo "==> password policy MySQL enforces"
-mysql -uroot -e "SHOW VARIABLES LIKE 'validate_password%';" || true
-
 echo "==> importing schema"
-curl -fsSL -o /tmp/gofit-schema.sql https://raw.githubusercontent.com/udayps10/GoFitApp/main/database_setup.sql
-mysql -uroot < /tmp/gofit-schema.sql && echo "  schema OK"
+SCHEMA="$(mktemp)"
+if ! curl -fsSL -o "$SCHEMA" https://raw.githubusercontent.com/udayps10/GoFitApp/main/database_setup.sql; then
+  echo "!! could not download schema" >&2
+  exit 1
+fi
+echo "  downloaded $(wc -c < "$SCHEMA") bytes"
+if ! mysql -uroot < "$SCHEMA"; then
+  echo "!! schema import failed" >&2
+  exit 1
+fi
+rm -f "$SCHEMA"
+echo "  tables in gofit: $(mysql -uroot -N -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='gofit';")"
 
 echo "==> creating MySQL user 'gofit'"
-mysql -uroot -e "CREATE USER IF NOT EXISTS 'gofit'@'%';"
+# password must satisfy validate_password (length>=8) and must NOT contain 'gofit'
+if ! mysql -uroot -e "CREATE USER IF NOT EXISTS 'gofit'@'%' IDENTIFIED BY '$APPPW';"; then
+  echo "!! CREATE USER failed" >&2
+  exit 1
+fi
 if ! mysql -uroot -e "ALTER USER 'gofit'@'%' IDENTIFIED BY '$APPPW';"; then
-  echo "!! MySQL password policy rejected [$APPPW] - see policy above" >&2
+  echo "!! ALTER USER failed" >&2
   exit 1
 fi
 mysql -uroot -e "GRANT ALL PRIVILEGES ON gofit.* TO 'gofit'@'%'; FLUSH PRIVILEGES;"
