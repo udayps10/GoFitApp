@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # GoFit deploy: pulls the prebuilt WAR from GitHub and installs it as Tomcat's ROOT.
-# Usage:  curl -fsSL https://raw.githubusercontent.com/udayps10/GoFitApp/main/deploy.sh | bash
+# Usage:  curl -fsSL https://raw.githubusercontent.com/udayps10/GoFitApp/refs/heads/main/deploy.sh | bash
 set -euo pipefail
 
-RAW="https://raw.githubusercontent.com/udayps10/GoFitApp/main"
+RAW="https://raw.githubusercontent.com/udayps10/GoFitApp/refs/heads/main"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 cd "$WORK"

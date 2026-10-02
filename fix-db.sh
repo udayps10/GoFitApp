@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # One-shot: create the MySQL user the app uses, point the container at it, verify.
-# Usage: curl -fsSL https://raw.githubusercontent.com/udayps10/GoFitApp/main/fix-db.sh | sudo bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/udayps10/GoFitApp/refs/heads/main/fix-db.sh | sudo bash
 set -uo pipefail
 
 ROOTPW='Uday@2006'
@@ -16,7 +16,7 @@ echo "  yes"
 
 echo "==> importing schema"
 SCHEMA="$(mktemp)"
-if ! curl -fsSL -o "$SCHEMA" https://raw.githubusercontent.com/udayps10/GoFitApp/main/database_setup.sql; then
+if ! curl -fsSL -o "$SCHEMA" https://raw.githubusercontent.com/udayps10/GoFitApp/refs/heads/main/database_setup.sql; then
   echo "!! could not download schema" >&2
   exit 1
 fi
