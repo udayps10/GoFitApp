@@ -69,7 +69,7 @@ Database name: `gofit`
 | heightCm | DECIMAL(5,2) | Height in cm (used for BMI) |
 | goal | VARCHAR(50) | e.g. Lose weight, Build muscle |
 
-### `exerciseLogs`
+### `exercise_logs`
 | Column | Type | Description |
 |---|---|---|
 | id | INT PK | Auto increment |
@@ -77,10 +77,10 @@ Database name: `gofit`
 | exerciseName | VARCHAR(100) | e.g. Bench Press |
 | weightKg | DECIMAL(5,2) | Dumbbell/barbell weight |
 | reps | INT | Number of reps |
-| logDate | DATE | Defaults to today |
-| createdAt | TIMESTAMP | Auto |
+| logged_date | DATE | Defaults to today |
+| created_at | TIMESTAMP | Auto |
 
-### `calorieLogs`
+### `calorie_logs`
 | Column | Type | Description |
 |---|---|---|
 | id | INT PK | Auto increment |
@@ -91,8 +91,8 @@ Database name: `gofit`
 | carbsG | DECIMAL(6,2) | Carbohydrates in grams |
 | proteinG | DECIMAL(6,2) | Protein in grams |
 | fatG | DECIMAL(6,2) | Fat in grams |
-| logDate | DATE | Defaults to today |
-| createdAt | TIMESTAMP | Auto |
+| logged_date | DATE | Defaults to today |
+| created_at | TIMESTAMP | Auto |
 
 ---
 

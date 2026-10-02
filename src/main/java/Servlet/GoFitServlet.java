@@ -160,7 +160,10 @@ public class GoFitServlet extends HttpServlet {
             catch (Exception e) { log.setReps(0); }
 
             try {
-                exerciseDAO.insert(log);
+                if (!exerciseDAO.insert(log)) {
+                    res.sendError(500, "Exercise could not be saved");
+                    return;
+                }
                 res.sendRedirect(req.getContextPath() + "/GoFit?page=workout");
             } catch (Exception e) {
                 e.printStackTrace();

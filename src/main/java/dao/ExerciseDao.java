@@ -9,7 +9,7 @@ import java.util.*;
 public class ExerciseDao {
 
     public boolean insert(ExerciseLog log) {
-        String sql = "INSERT INTO exerciseLogs (userId, exerciseName, weightKg, reps) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO exercise_logs (userId, exerciseName, weightKg, reps) VALUES (?, ?, ?, ?)";
         try (Connection con = DBConnection.getconnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -27,7 +27,7 @@ public class ExerciseDao {
     }
 
     public List<ExerciseLog> findByUserToday(int userId) {
-        String sql = "SELECT * FROM exerciseLogs WHERE userId = ? AND logDate = CURDATE() ORDER BY createdAt DESC";
+        String sql = "SELECT * FROM exercise_logs WHERE userId = ? AND logged_date = CURDATE() ORDER BY created_at DESC";
         List<ExerciseLog> list = new ArrayList<>();
         try (Connection con = DBConnection.getconnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -42,7 +42,7 @@ public class ExerciseDao {
                 log.setExerciseName(rs.getString("exerciseName")); 
                 log.setWeightKg(rs.getDouble("weightKg"));         
                 log.setReps(rs.getInt("reps"));                    
-                log.setLogDate(rs.getDate("logDate"));             
+                log.setLogDate(rs.getDate("logged_date"));             
                 list.add(log);
             }
 
@@ -54,7 +54,7 @@ public class ExerciseDao {
 
     
     public List<ExerciseLog> findByUserAndDate(int userId, Date date) {
-        String sql = "SELECT * FROM exerciseLogs WHERE userId = ? AND logDate = ? ORDER BY createdAt DESC";
+        String sql = "SELECT * FROM exercise_logs WHERE userId = ? AND logged_date = ? ORDER BY created_at DESC";
         List<ExerciseLog> list = new ArrayList<>();
         try (Connection con = DBConnection.getconnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -70,7 +70,7 @@ public class ExerciseDao {
                 log.setExerciseName(rs.getString("exerciseName"));
                 log.setWeightKg(rs.getDouble("weightKg"));
                 log.setReps(rs.getInt("reps"));
-                log.setLogDate(rs.getDate("logDate"));
+                log.setLogDate(rs.getDate("logged_date"));
                 list.add(log);
             }
 
@@ -81,7 +81,7 @@ public class ExerciseDao {
     }
 
     public boolean delete(int id, int userId) {
-        String sql = "DELETE FROM exerciseLogs WHERE id = ? AND userId = ?";
+        String sql = "DELETE FROM exercise_logs WHERE id = ? AND userId = ?";
         try (Connection con = DBConnection.getconnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -96,7 +96,7 @@ public class ExerciseDao {
     }
 
     public int countToday(int userId) {
-        String sql = "SELECT COUNT(*) FROM exerciseLogs WHERE userId = ? AND logDate = CURDATE()";
+        String sql = "SELECT COUNT(*) FROM exercise_logs WHERE userId = ? AND logged_date = CURDATE()";
         try (Connection con = DBConnection.getconnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -111,7 +111,7 @@ public class ExerciseDao {
     }
 
     public int countByDate(int userId, Date date) {
-        String sql = "SELECT COUNT(*) FROM exerciseLogs WHERE userId = ? AND logDate = ?";
+        String sql = "SELECT COUNT(*) FROM exercise_logs WHERE userId = ? AND logged_date = ?";
         try (Connection con = DBConnection.getconnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
