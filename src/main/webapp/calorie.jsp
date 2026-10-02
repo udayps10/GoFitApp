@@ -205,7 +205,7 @@
 </div>
 
 <nav>
-  <a href="userdashboard.jsp" class="nav-brand">
+  <a href="<%=request.getContextPath()%>/GoFit?page=dashboard" class="nav-brand">
     <%@ include file="/WEB-INF/fragments/logo.jspf" %>
   </a>
   <div class="nav-right">
@@ -222,7 +222,7 @@
   <div class="nav-brand-row">
     <%@ include file="/WEB-INF/fragments/logo.jspf" %>
   </div>
-  <a href="userdashboard.jsp"><span class="nav-icon">📊</span> Dashboard</a>
+  <a href="<%=request.getContextPath()%>/GoFit?page=dashboard"><span class="nav-icon">📊</span> Dashboard</a>
   <a href="<%=request.getContextPath()%>/GoFit?page=calorie" class="active"><span class="nav-icon">🍎</span> Food Tracking</a>
   <a href="<%=request.getContextPath()%>/GoFit?page=workout"><span class="nav-icon">🏋️</span> Workout</a>
   <div class="nav-divider"></div>

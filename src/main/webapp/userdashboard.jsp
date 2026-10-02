@@ -1,5 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="model.User" %>
+<%@ page import="model.User, model.CalorieLog, java.util.List" %>
 <%
     User currentUser = (User) session.getAttribute("user");
     if (currentUser == null) {
@@ -17,6 +17,8 @@
     Integer exerciseCountAttr = (Integer) request.getAttribute("exerciseCount");
     int totalKcal = (totalKcalAttr != null) ? totalKcalAttr : 0;
     int exerciseCount = (exerciseCountAttr != null) ? exerciseCountAttr : 0;
+    List<CalorieLog> foodLogs = (List<CalorieLog>) request.getAttribute("calorieLogs");
+    if (foodLogs == null) foodLogs = java.util.Collections.emptyList();
     String displayName = (currentUser.getName() != null && !currentUser.getName().trim().isEmpty())
         ? currentUser.getName().split(" ")[0] : "there";
     double weightKgVal = currentUser.getWeightKg();
@@ -680,13 +682,43 @@
     </div>
   </div>
 
-  <!-- FOOD LOG (today's items pulled from the server on Food Tracking page; this dashboard just adds new entries which persist immediately) -->
   <div class="section-card">
-    <div class="section-title">🥗 Quick-Add Food</div>
-    <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">
-      Items you add here are saved immediately. See your full list on the <a href="<%=request.getContextPath()%>/GoFit?page=calorie" style="color:var(--green);">Food Tracking</a> page.
-    </p>
+    <div class="section-title"><%= isToday ? "🥗 Today's Food" : "🥗 Food · " + selectedDateStr %></div>
+    <div id="food-list">
+      <%
+        if (foodLogs.isEmpty()) {
+      %>
+        <div class="empty-msg">No food logged yet.</div>
+      <%
+        } else {
+          for (CalorieLog fl : foodLogs) {
+            String fn = (fl.getFoodName() == null) ? "" : fl.getFoodName();
+            String sv = (fl.getServing() == null) ? "1 serving" : fl.getServing();
+            fn = fn.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;");
+            sv = sv.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;");
+      %>
+        <div class="food-item">
+          <div>
+            <div class="fi-name"><%= fn %></div>
+            <div class="fi-cal"><%= sv %> · <%= fl.getKcal() %> kcal</div>
+          </div>
+          <% if (isToday) { %>
+          <form action="<%=request.getContextPath()%>/GoFit" method="post" style="margin:0;">
+            <input type="hidden" name="action" value="deleteCalorie">
+            <input type="hidden" name="id" value="<%= fl.getId() %>">
+            <button type="submit" class="rm-btn" title="Remove">&times;</button>
+          </form>
+          <% } %>
+        </div>
+      <%
+          }
+        }
+      %>
+    </div>
     <button class="add-btn" id="add-food-btn" onclick="openModal('food')">+ Add Food</button>
+    <p style="font-size:12px;color:var(--muted);margin-top:10px;text-align:center;">
+      Full history on the <a href="<%=request.getContextPath()%>/GoFit?page=calorie" style="color:var(--green);">Food Tracking</a> page.
+    </p>
   </div>
 
   <!-- WORKOUT LOG (same — real add persists via GoFit servlet; full history on Workout page) -->
@@ -880,6 +912,10 @@
   var SELECTED_DATE = "<%= selectedDateStr %>"; // yyyy-MM-dd
   var IS_TODAY = <%= isToday %>;
 
+  function reloadDashboard() {
+    window.location.href = contextPath + '/GoFit?page=dashboard&date=' + encodeURIComponent(SELECTED_DATE);
+  }
+
   function getLocalDateStr(d) {
     return d.getFullYear() + '-' +
       String(d.getMonth()+1).padStart(2,'0') + '-' +
@@ -896,7 +932,7 @@
     var nowStr = getLocalDateStr(new Date());
     if (nowStr !== todayStr) {
       todayStr = nowStr;
-      if (IS_TODAY) location.reload(); // new day — reload to pull fresh totals from the server
+      if (IS_TODAY) window.location.href = contextPath + '/GoFit?page=dashboard';
     }
   }
   setInterval(checkMidnight, 60000); // check every minute
@@ -906,7 +942,7 @@
     d.setDate(d.getDate() + dir);
     var newDateStr = getLocalDateStr(d);
     if (newDateStr > todayStr) return; // block future dates
-    window.location.href = 'GoFit?page=dashboard&date=' + newDateStr;
+    window.location.href = contextPath + '/GoFit?page=dashboard&date=' + newDateStr;
   }
 
   function updateDateDisplay() {
@@ -996,7 +1032,7 @@
       document.getElementById('food-name').value = '';
       document.getElementById('food-cal').value = '';
       closeModal('food');
-      location.reload(); // refresh dashboard totals from server
+      reloadDashboard();
     }).catch(function(err) { alert('Could not save: ' + err.message); });
   }
 
@@ -1017,7 +1053,7 @@
       if (!res.ok) throw new Error('Server returned ' + res.status);
       ['ex-name','ex-sets','ex-reps','ex-weight'].forEach(function(id) { document.getElementById(id).value = ''; });
       closeModal('workout');
-      location.reload();
+      reloadDashboard();
     }).catch(function(err) { alert('Could not save: ' + err.message); });
   }
 
@@ -1033,7 +1069,7 @@
       if (!res.ok) throw new Error('Server returned ' + res.status);
       document.getElementById('new-weight').value = '';
       closeModal('weight');
-      location.reload(); // refresh so weight + BMI reflect the saved value from the server
+      reloadDashboard();
     }).catch(function(err) { alert('Could not save weight: ' + err.message); });
   }
 
@@ -1065,7 +1101,7 @@
     }).then(function(data) {
       currentGoal = pendingGoal;
       closeModal('goal');
-      location.reload(); // refresh so goal + recalculated calorie target reflect the saved server value
+      reloadDashboard();
     }).catch(function(err) { alert('Could not save goal: ' + err.message); });
   }
 
@@ -1230,7 +1266,7 @@
       hideScanResult();
       resetCam();
       closeModal('food');
-      location.reload();
+      reloadDashboard();
     }).catch(function(err) { alert('Some items failed to save: ' + err.message); });
   }
 
