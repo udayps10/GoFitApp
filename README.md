@@ -151,8 +151,15 @@ Already bundled at `src/main/webapp/WEB-INF/lib/mysql-connector-j-9.5.0.jar` (pl
 - Open browser: `http://localhost:8080/GOFIT/homepage.jsp`
 
 ### 6. Build the WAR manually
+
+> **Always compile with `--release 21`.** The server image is `tomcat:9-jdk21`; a newer
+> JDK emits class files Tomcat can't load (`UnsupportedClassVersionError`), which kills
+> the servlet and returns 404 on every action URL.
+
 ```powershell
-javac -encoding UTF-8 -cp "<tomcat>/lib/servlet-api.jar;src/main/webapp/WEB-INF/lib/*" -d build/classes (Get-ChildItem src/main/java -Recurse -Filter *.java).FullName
+javac --release 21 -encoding UTF-8 `
+  -cp "<tomcat>/lib/servlet-api.jar;src/main/webapp/WEB-INF/lib/*" `
+  -d build/classes (Get-ChildItem src/main/java -Recurse -Filter *.java).FullName
 # then package build/classes into GOFIT.war under WEB-INF/classes, or use the Dockerfile
 ```
 
